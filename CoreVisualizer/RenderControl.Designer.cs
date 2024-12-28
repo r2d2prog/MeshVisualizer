@@ -38,19 +38,19 @@
             this.glControl.DrawFPS = false;
             this.glControl.Location = new System.Drawing.Point(0, 0);
             this.glControl.Name = "glControl";
-            this.glControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
-            this.glControl.RenderContextType = SharpGL.RenderContextType.DIBSection;
-            this.glControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
+            this.glControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL4_0;
+            this.glControl.RenderContextType = SharpGL.RenderContextType.NativeWindow;
+            this.glControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
             this.glControl.Size = new System.Drawing.Size(150, 150);
             this.glControl.TabIndex = 0;
             this.glControl.OpenGLInitialized += new System.EventHandler(this.OnInit);
             // 
-            // VisualizerControl
+            // RenderControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.glControl);
-            this.Name = "VisualizerControl";
+            this.Name = "RenderControl";
             ((System.ComponentModel.ISupportInitialize)(this.glControl)).EndInit();
             this.ResumeLayout(false);
 

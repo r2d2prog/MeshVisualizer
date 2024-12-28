@@ -38,7 +38,7 @@
             this.настройкиToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.renderControl1 = new CoreVisualizer.RenderControl();
+            this.renderControl = new CoreVisualizer.RenderControl();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -103,7 +103,7 @@
             // 
             // toolStripContainer1.ContentPanel
             // 
-            this.toolStripContainer1.ContentPanel.Controls.Add(this.renderControl1);
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.renderControl);
             this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(800, 401);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.LeftToolStripPanelVisible = false;
@@ -126,13 +126,14 @@
             this.toolStrip1.Size = new System.Drawing.Size(111, 25);
             this.toolStrip1.TabIndex = 0;
             // 
-            // renderControl1
+            // renderControl
             // 
-            this.renderControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderControl1.Location = new System.Drawing.Point(0, 0);
-            this.renderControl1.Name = "renderControl1";
-            this.renderControl1.Size = new System.Drawing.Size(800, 401);
-            this.renderControl1.TabIndex = 0;
+            this.renderControl.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl.Location = new System.Drawing.Point(0, 0);
+            this.renderControl.Name = "renderControl";
+            this.renderControl.Size = new System.Drawing.Size(800, 401);
+            this.renderControl.TabIndex = 0;
             // 
             // RenderForm
             // 
@@ -168,7 +169,7 @@
         private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem1;
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private CoreVisualizer.RenderControl renderControl1;
+        private CoreVisualizer.RenderControl renderControl;
     }
 }
 
