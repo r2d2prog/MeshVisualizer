@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grid.cs" />
     <Compile Include="Interfaces\IRenderControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderControl.cs">
@@ -67,6 +68,7 @@
     <Compile Include="RenderControl.Designer.cs">
       <DependentUpon>RenderControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ShaderProgramCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

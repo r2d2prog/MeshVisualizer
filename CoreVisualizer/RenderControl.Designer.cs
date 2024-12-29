@@ -38,7 +38,7 @@
             this.glControl.DrawFPS = false;
             this.glControl.Location = new System.Drawing.Point(0, 0);
             this.glControl.Name = "glControl";
-            this.glControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL4_0;
+            this.glControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL3_3;
             this.glControl.RenderContextType = SharpGL.RenderContextType.NativeWindow;
             this.glControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
             this.glControl.Size = new System.Drawing.Size(150, 150);
