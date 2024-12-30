@@ -37,8 +37,8 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.renderControl = new CoreVisualizer.RenderControl();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -118,6 +118,15 @@
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
+            // renderControl
+            // 
+            this.renderControl.BackColor = System.Drawing.SystemColors.Desktop;
+            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl.Location = new System.Drawing.Point(0, 0);
+            this.renderControl.Name = "renderControl";
+            this.renderControl.Size = new System.Drawing.Size(800, 401);
+            this.renderControl.TabIndex = 0;
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
@@ -125,15 +134,6 @@
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(111, 25);
             this.toolStrip1.TabIndex = 0;
-            // 
-            // renderControl
-            // 
-            this.renderControl.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderControl.Location = new System.Drawing.Point(0, 0);
-            this.renderControl.Name = "renderControl";
-            this.renderControl.Size = new System.Drawing.Size(800, 401);
-            this.renderControl.TabIndex = 0;
             // 
             // RenderForm
             // 
