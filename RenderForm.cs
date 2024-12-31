@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreVisualizer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +16,13 @@ namespace MeshVisualizer
         public RenderForm()
         {
             InitializeComponent();
+        }
+
+        private void OnAlignCamera(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            var plane = (ViewPlane)Enum.Parse(typeof(ViewPlane), control.Text);
+            renderControl.AlignCamera(plane);
         }
     }
 }

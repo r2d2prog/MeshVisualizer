@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Interfaces\IRenderControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

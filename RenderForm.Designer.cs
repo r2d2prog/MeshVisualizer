@@ -39,10 +39,22 @@
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.renderControl = new CoreVisualizer.RenderControl();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.перспективнаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ортографическаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.xYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.yXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.xZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.yZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -130,10 +142,103 @@
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton1,
+            this.toolStripSeparator2,
+            this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(111, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(225, 25);
             this.toolStrip1.TabIndex = 0;
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.перспективнаяToolStripMenuItem,
+            this.ортографическаяToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(75, 22);
+            this.toolStripDropDownButton1.Text = "Проекция";
+            // 
+            // перспективнаяToolStripMenuItem
+            // 
+            this.перспективнаяToolStripMenuItem.Checked = true;
+            this.перспективнаяToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.перспективнаяToolStripMenuItem.Name = "перспективнаяToolStripMenuItem";
+            this.перспективнаяToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.перспективнаяToolStripMenuItem.Text = "Перспективная";
+            // 
+            // ортографическаяToolStripMenuItem
+            // 
+            this.ортографическаяToolStripMenuItem.Name = "ортографическаяToolStripMenuItem";
+            this.ортографическаяToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ортографическаяToolStripMenuItem.Text = "Ортографическая";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripDropDownButton2
+            // 
+            this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.xYToolStripMenuItem,
+            this.yXToolStripMenuItem,
+            this.zXToolStripMenuItem,
+            this.xZToolStripMenuItem,
+            this.yZToolStripMenuItem,
+            this.zYToolStripMenuItem});
+            this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
+            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            this.toolStripDropDownButton2.Size = new System.Drawing.Size(101, 22);
+            this.toolStripDropDownButton2.Text = "Выравнивание";
+            // 
+            // xYToolStripMenuItem
+            // 
+            this.xYToolStripMenuItem.Name = "xYToolStripMenuItem";
+            this.xYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.xYToolStripMenuItem.Text = "XY";
+            this.xYToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // yXToolStripMenuItem
+            // 
+            this.yXToolStripMenuItem.Name = "yXToolStripMenuItem";
+            this.yXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.yXToolStripMenuItem.Text = "YX";
+            this.yXToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // zXToolStripMenuItem
+            // 
+            this.zXToolStripMenuItem.Name = "zXToolStripMenuItem";
+            this.zXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.zXToolStripMenuItem.Text = "ZX";
+            this.zXToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // xZToolStripMenuItem
+            // 
+            this.xZToolStripMenuItem.Name = "xZToolStripMenuItem";
+            this.xZToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.xZToolStripMenuItem.Text = "XZ";
+            this.xZToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // yZToolStripMenuItem
+            // 
+            this.yZToolStripMenuItem.Name = "yZToolStripMenuItem";
+            this.yZToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.yZToolStripMenuItem.Text = "YZ";
+            this.yZToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // zYToolStripMenuItem
+            // 
+            this.zYToolStripMenuItem.Name = "zYToolStripMenuItem";
+            this.zYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.zYToolStripMenuItem.Text = "ZY";
+            this.zYToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // RenderForm
             // 
@@ -153,6 +258,8 @@
             this.toolStripContainer1.TopToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -170,6 +277,17 @@
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private CoreVisualizer.RenderControl renderControl;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem перспективнаяToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ортографическаяToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
+        private System.Windows.Forms.ToolStripMenuItem xYToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem yXToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zXToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem xZToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem yZToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zYToolStripMenuItem;
     }
 }
 
