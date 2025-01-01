@@ -44,6 +44,10 @@
             this.glControl.Size = new System.Drawing.Size(150, 150);
             this.glControl.TabIndex = 0;
             this.glControl.OpenGLInitialized += new System.EventHandler(this.OnInit);
+            this.glControl.Resized += new System.EventHandler(this.OnResize);
+            this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
+            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove);
+            this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnMouseUp);
             // 
             // RenderControl
             // 

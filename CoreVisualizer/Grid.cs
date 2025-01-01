@@ -18,7 +18,7 @@ namespace CoreVisualizer
     {
         private static OpenGL Gl = RenderControl.Gl;
 
-        private static Color ThinColor { get; set; }  = Color.DarkSlateGray;
+        private static Color ThinColor { get; set; } = Color.DarkSlateGray;
         private static Color ThickColor { get; set; } = Color.LightSlateGray;
 
         private static float ThinThickness { get; set; } = 1f;
@@ -29,16 +29,19 @@ namespace CoreVisualizer
         private int ThickStart { get; set; }
         private int ThickCount { get; set; }
 
-        private uint[] VAO {  get; set; }
+        private int OrtsStart { get; set; }
+        private int OrtsCount { get; set; }
+
+        private uint[] VAO { get; set; }
         private uint[] VertexBuffer { get; set; }
         private uint[] ColorBuffer { get; set; }
-        private enum LineLayout 
-        { 
+        private enum LineLayout
+        {
             Vertical,
             Horizontal
         }
-        
-        public Grid(float aspectRatio, uint gridSize = 200) 
+
+        public Grid(float aspectRatio, uint gridSize = 200)
         {
             if (gridSize != 0)
             {
@@ -57,21 +60,19 @@ namespace CoreVisualizer
             return program;
         }
 
-        public void Draw(ShaderProgramCreator program, float aRatio)
+        public void Draw(ShaderProgramCreator program)
         {
             Gl.UseProgram(program.Program);
             Gl.BindVertexArray(VAO[0]);
-            
-            var proj = mat4.Perspective((float)Math.PI / 3, aRatio, 0.1f, 100f).ToArray();
-            var view = mat4.LookAt(new vec3(0.5f, 0.25f, 0.2f), new vec3(0, 0, 0), new vec3(0, 1, 0)).ToArray();
-            program.SetUniform("perspective", proj);
-            program.SetUniform("view", view);
+
+            program.SetUniform("perspective", Camera.Projection.ToArray());
+            program.SetUniform("view", Camera.View.ToArray());
 
             Gl.LineWidth(ThinThickness);
             Gl.DrawArrays(Gl.GL_LINES, ThinStart, ThinCount);
 
             Gl.LineWidth(ThickThickness);
-            Gl.DrawArrays(Gl.GL_LINES, ThickStart, ThickCount);
+            Gl.DrawArrays(Gl.GL_LINES, ThickStart, ThickCount + OrtsCount);
 
             Gl.BindVertexArray(0);
             Gl.UseProgram(0);
@@ -105,13 +106,53 @@ namespace CoreVisualizer
             ThickStart = ThinCount;
             ThickCount = thickCoords.Count / 3;
 
-            var thinColors = CreateColors(ThinColor);
-            var thickColors = CreateColors(ThickColor);
+            OrtsStart = ThickStart + ThickCount;
+            OrtsCount = 6;
+
+            var thinColors = CreateColors(ThinColor, ThinCount);
+            var thickColors = CreateColors(ThickColor, ThickCount);
+
+            var ortsColors = new float[3 * 2 * 4];
+            var ortsCoords = new float[3 * 2 * 3];
+            CreateOrts(ortsCoords, ortsColors, modelSize);
 
             thinCoords.AddRange(thickCoords);
-            var coordsData = thinCoords.ToArray();       
+            var coordsData = thinCoords.ToArray();
+            coordsData = coordsData.Concat(ortsCoords).ToArray();
+
             var colorsData = thinColors.Concat(thickColors).ToArray();
+            colorsData = colorsData.Concat(ortsColors).ToArray();
+
             CreateVertexArray(coordsData, colorsData);
+        }
+
+        private void CreateOrts(float[] coords, float[] colors, float modelSize)
+        {
+            var ortSize = 10 * modelSize;
+            //X
+            coords[1] = 1e-4f;
+            coords[3] = ortSize;
+            coords[4] = 1e-4f;
+            SetArrayColor(colors, 0, 8, Color.Red);
+            //Y
+            coords[10] = ortSize;
+            SetArrayColor(colors, 8, 8, Color.Green);
+            //Z
+            coords[13] = 1e-4f;
+            coords[16] = 1e-4f;
+            coords[17] = ortSize;
+            SetArrayColor(colors, 16, 8, Color.Blue);
+        }
+
+        private void SetArrayColor(float[] colors, int stride, int attribCount, Color color)
+        {
+            for (var i = stride; i < stride + attribCount; i += 4)
+            {
+                colors[i] = color.R / 255f;
+                colors[i + 1] = color.G / 255f;
+                colors[i + 2] = color.B / 255f;
+                colors[i + 3] = color.A / 255f;
+            }
         }
 
         private void CreateLineCoords(List<float> storage, int index, float modelSize, float maxCoord, LineLayout layout)
@@ -136,9 +177,9 @@ namespace CoreVisualizer
             storage.AddRange(line);
         }
 
-        private float[] CreateColors(Color color)
+        private float[] CreateColors(Color color, int count)
         {
-            return Enumerable.Range(0, ThinCount).Select(v => color)
+            return Enumerable.Range(0, count).Select(v => color)
                              .Select(v => new float[] { v.R / 255f, v.G / 255f, v.B / 255f, v.A / 255f })
                              .SelectMany(v => v).ToArray();
         }
