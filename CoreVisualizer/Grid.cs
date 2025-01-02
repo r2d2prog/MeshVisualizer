@@ -51,15 +51,6 @@ namespace CoreVisualizer
             }
         }
 
-        public ShaderProgramCreator CreateShaderProgram()
-        {
-            var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, GridShaders.gridVertex);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, GridShaders.gridFragment);
-            program.Link();
-            return program;
-        }
-
         public void Draw(ShaderProgramCreator program)
         {
             Gl.UseProgram(program.Program);

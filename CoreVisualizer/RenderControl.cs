@@ -1,6 +1,7 @@
 ﻿using CoreVisualizer.Interfaces;
 using GlmSharp;
 using SharpGL;
+using SharpGL.Enumerations;
 using SharpGL.SceneGraph.Lighting;
 using SharpGL.SceneGraph.Shaders;
 using System;
@@ -26,6 +27,7 @@ namespace CoreVisualizer
         private Point lastMousePos;
         private Camera camera;
         private Grid grid;
+        private Arrows arrow;
 
         public RenderControl()
         {
@@ -57,13 +59,13 @@ namespace CoreVisualizer
             grid.Draw(Programs["Grid"]);
         }
 
-        private void CreateGridShaderProgram()
+        private void CreateShaderProgram(string key, string[] vSource, string[] fSource)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, GridShaders.gridVertex);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, GridShaders.gridFragment);
+            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vSource);
+            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fSource);
             program.Link();
-            Programs.Add("Grid", program);
+            Programs.Add(key, program);
         }
 
         private void OnInit(object sender, EventArgs e)
@@ -72,21 +74,25 @@ namespace CoreVisualizer
             glControl.MouseWheel += OnMouseWheel;
             glControl.OpenGLDraw += DrawScene;
             ShowGrid(true);
+
             Programs = new Dictionary<string, ShaderProgramCreator>();
 
             Gl.Enable(Gl.GL_DEPTH_TEST);
             Gl.DepthFunc(Gl.GL_LEQUAL);
             Gl.Enable(Gl.GL_LINE_SMOOTH);
 
-            camera = new Camera(new vec3(0f, 0.0f, 1f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
+            camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
-            CreateGridShaderProgram();
+            arrow = new Arrows();
+            CreateShaderProgram("Grid", GridShaders.gridVertex, GridShaders.gridFragment);
+            CreateShaderProgram("Surface", ArrowShaders.surfaceVertex, ArrowShaders.surfaceFragment);
             Disposed += OnDisposed;
         }
 
         private void OnDisposed(object sender, EventArgs e)
         {
             grid.Dispose();
+            arrow.Dispose();
             foreach (var program in Programs)
                 program.Value.Dispose();
         }
@@ -96,6 +102,8 @@ namespace CoreVisualizer
             Gl.Viewport(0, 0, glControl.Width, glControl.Height);
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
+            //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);//Режимы отображения будут позже
+            arrow?.Draw(Programs["Surface"]);
         }
 
         private void OnResize(object sender, EventArgs e)
