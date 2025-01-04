@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeshVisualizer", "MeshVisualizer.csproj", "{7E3C1066-F4D4-4164-A1AF-DAC94AF31B24}"
-	ProjectSection(ProjectDependencies) = postProject
-		{287B0695-6A1B-410F-BE0B-EBAD137149A9} = {287B0695-6A1B-410F-BE0B-EBAD137149A9}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreVisualizer", "CoreVisualizer\CoreVisualizer.csproj", "{287B0695-6A1B-410F-BE0B-EBAD137149A9}"
 EndProject

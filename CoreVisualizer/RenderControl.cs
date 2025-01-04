@@ -18,7 +18,7 @@ using Gl = SharpGL.OpenGL;
 
 namespace CoreVisualizer
 {
-    public partial class RenderControl : UserControl, IRenderControl
+    public partial class RenderControl : UserControl , IRenderControl
     {
         internal static OpenGL Gl { get; set; }
         private Dictionary<string, ShaderProgramCreator> Programs { get; set; }
@@ -27,7 +27,10 @@ namespace CoreVisualizer
         private Point lastMousePos;
         private Camera camera;
         private Grid grid;
-        private Arrows arrow;
+        private Arrows arrows;
+        private ArrowLabels arrowLabels;
+
+        public bool ShowGrid { get; set; }
 
         public RenderControl()
         {
@@ -37,14 +40,6 @@ namespace CoreVisualizer
         public void DoRender()
         {
             glControl.Invalidate();
-        }
-
-        public void ShowGrid(bool show)
-        {
-            if (show)
-                glControl.OpenGLDraw += DrawGrid;
-            else
-                glControl.OpenGLDraw -= DrawGrid;
         }
 
         public void AlignCamera(ViewPlane plane)
@@ -68,12 +63,16 @@ namespace CoreVisualizer
             Programs.Add(key, program);
         }
 
+        public void PostInit()
+        {
+            arrowLabels = new ArrowLabels();
+        }
+
         private void OnInit(object sender, EventArgs e)
         {
             Gl = glControl.OpenGL;
             glControl.MouseWheel += OnMouseWheel;
             glControl.OpenGLDraw += DrawScene;
-            ShowGrid(true);
 
             Programs = new Dictionary<string, ShaderProgramCreator>();
 
@@ -83,16 +82,18 @@ namespace CoreVisualizer
 
             camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
-            arrow = new Arrows();
+            arrows = new Arrows();
             CreateShaderProgram("Grid", GridShaders.gridVertex, GridShaders.gridFragment);
-            CreateShaderProgram("Surface", ArrowShaders.surfaceVertex, ArrowShaders.surfaceFragment);
+            CreateShaderProgram("Arrows", ArrowShaders.arrowsVertex, ArrowShaders.arrowsFragment);
+            CreateShaderProgram("Labels", ArrowLabelsShaders.labelsVertex, ArrowLabelsShaders.labelsFragment);
             Disposed += OnDisposed;
         }
 
         private void OnDisposed(object sender, EventArgs e)
         {
-            grid.Dispose();
-            arrow.Dispose();
+            grid?.Dispose();
+            arrows?.Dispose();
+            arrowLabels?.Dispose();
             foreach (var program in Programs)
                 program.Value.Dispose();
         }
@@ -103,14 +104,17 @@ namespace CoreVisualizer
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);//Режимы отображения будут позже
-            arrow?.Draw(Programs["Surface"]);
+            if (ShowGrid)
+                grid?.Draw(Programs["Grid"]);
+            arrows?.Draw(Programs["Arrows"]);
+            arrowLabels?.Draw(Programs["Labels"]);
         }
 
         private void OnResize(object sender, EventArgs e)
         {
             var aspectRatio = (float)glControl.Width / glControl.Height;
             Gl.Viewport(0, 0, glControl.Width, glControl.Height);
-            camera.ChangePerspectiveProjection((float)Math.PI / 3, aspectRatio, 0.1f, 100f);
+            camera?.ChangePerspectiveProjection((float)Math.PI / 3, aspectRatio, 0.1f, 100f);
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)

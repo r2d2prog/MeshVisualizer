@@ -8,8 +8,8 @@ namespace CoreVisualizer.Interfaces
 {
     public interface IRenderControl
     {
+        bool ShowGrid { get; set; }
         void DoRender();
         void AlignCamera(ViewPlane plane);
-        void ShowGrid(bool show);
     }
 }

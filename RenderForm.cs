@@ -16,6 +16,7 @@ namespace MeshVisualizer
         public RenderForm()
         {
             InitializeComponent();
+            renderControl.PostInit();
         }
 
         private void OnAlignCamera(object sender, EventArgs e)

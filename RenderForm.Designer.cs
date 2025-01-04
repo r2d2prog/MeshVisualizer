@@ -37,7 +37,6 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.renderControl = new CoreVisualizer.RenderControl();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.перспективнаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,6 +49,7 @@
             this.xZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.yZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderControl = new CoreVisualizer.RenderControl();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -130,15 +130,6 @@
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
-            // renderControl
-            // 
-            this.renderControl.BackColor = System.Drawing.SystemColors.Desktop;
-            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderControl.Location = new System.Drawing.Point(0, 0);
-            this.renderControl.Name = "renderControl";
-            this.renderControl.Size = new System.Drawing.Size(800, 401);
-            this.renderControl.TabIndex = 0;
-            // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
@@ -148,7 +139,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(225, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(194, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // toolStripDropDownButton1
@@ -168,13 +159,13 @@
             this.перспективнаяToolStripMenuItem.Checked = true;
             this.перспективнаяToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.перспективнаяToolStripMenuItem.Name = "перспективнаяToolStripMenuItem";
-            this.перспективнаяToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.перспективнаяToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.перспективнаяToolStripMenuItem.Text = "Перспективная";
             // 
             // ортографическаяToolStripMenuItem
             // 
             this.ортографическаяToolStripMenuItem.Name = "ортографическаяToolStripMenuItem";
-            this.ортографическаяToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ортографическаяToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.ортографическаяToolStripMenuItem.Text = "Ортографическая";
             // 
             // toolStripSeparator2
@@ -201,44 +192,54 @@
             // xYToolStripMenuItem
             // 
             this.xYToolStripMenuItem.Name = "xYToolStripMenuItem";
-            this.xYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.xYToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.xYToolStripMenuItem.Text = "XY";
             this.xYToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // yXToolStripMenuItem
             // 
             this.yXToolStripMenuItem.Name = "yXToolStripMenuItem";
-            this.yXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.yXToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.yXToolStripMenuItem.Text = "YX";
             this.yXToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // zXToolStripMenuItem
             // 
             this.zXToolStripMenuItem.Name = "zXToolStripMenuItem";
-            this.zXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.zXToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.zXToolStripMenuItem.Text = "ZX";
             this.zXToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // xZToolStripMenuItem
             // 
             this.xZToolStripMenuItem.Name = "xZToolStripMenuItem";
-            this.xZToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.xZToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.xZToolStripMenuItem.Text = "XZ";
             this.xZToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // yZToolStripMenuItem
             // 
             this.yZToolStripMenuItem.Name = "yZToolStripMenuItem";
-            this.yZToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.yZToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.yZToolStripMenuItem.Text = "YZ";
             this.yZToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
             // zYToolStripMenuItem
             // 
             this.zYToolStripMenuItem.Name = "zYToolStripMenuItem";
-            this.zYToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.zYToolStripMenuItem.Size = new System.Drawing.Size(88, 22);
             this.zYToolStripMenuItem.Text = "ZY";
             this.zYToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
+            // 
+            // renderControl
+            // 
+            this.renderControl.BackColor = System.Drawing.SystemColors.ControlText;
+            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl.Location = new System.Drawing.Point(0, 0);
+            this.renderControl.Name = "renderControl";
+            this.renderControl.ShowGrid = true;
+            this.renderControl.Size = new System.Drawing.Size(800, 401);
+            this.renderControl.TabIndex = 0;
             // 
             // RenderForm
             // 
@@ -276,7 +277,6 @@
         private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem1;
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private CoreVisualizer.RenderControl renderControl;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem перспективнаяToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ортографическаяToolStripMenuItem;
@@ -288,6 +288,7 @@
         private System.Windows.Forms.ToolStripMenuItem xZToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem yZToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zYToolStripMenuItem;
+        private CoreVisualizer.RenderControl renderControl;
     }
 }
 

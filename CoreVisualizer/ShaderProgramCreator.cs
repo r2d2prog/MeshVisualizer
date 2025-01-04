@@ -28,10 +28,10 @@ namespace CoreVisualizer
 
         public void Unbind() => Gl.UseProgram(0);
 
-        public void BindTextureRect(string name, uint texId, uint texUnit)
+        public void BindTexture(string name, uint target, uint texId, uint texUnit)
         {
             Gl.ActiveTexture(Gl.GL_TEXTURE0 + texUnit);
-            Gl.BindTexture(Gl.GL_TEXTURE_RECTANGLE_ARB, texId);
+            Gl.BindTexture(target, texId);
             var id = Gl.GetUniformLocation(Program, name);
             Gl.Uniform1(id, (int)texUnit);
         }

@@ -34,11 +34,9 @@ namespace CoreVisualizer
             var tY = mat4.Translate(new vec3(0.0f, 0.034f, 0.0f));
             var tZ = mat4.Translate(new vec3(0.0f, 0.00f, 0.04f));
 
-            var shift = mat4.Translate(new vec3(0.0f, 0.0f, -0.20f));
-
-            var xAxis = /*shift * tX **/ tX * rX * sX;
-            var yAxis = /*shift * tY **/ tY * rY * sX;
-            var zAxis = /*shift * tZ **/ tZ * rZ * sX;
+            var xAxis = tX * rX * sX;
+            var yAxis = tY * rY * sX;
+            var zAxis = tZ * rZ * sX;
             ModelMatrix = new mat4[] { xAxis, yAxis, zAxis };
             List<int> indices = null, conIndices = null;
             List<float> coords = null, conCoords = null;
@@ -179,7 +177,7 @@ namespace CoreVisualizer
 
     public class ArrowShaders
     {
-        public static string[] surfaceVertex = new string[]
+        public static string[] arrowsVertex = new string[]
         {
             "#version 330 core\n",
             "layout (location = 0) in vec3 position;\n",
@@ -198,7 +196,7 @@ namespace CoreVisualizer
             "}\n",
         };
 
-        public static string[] surfaceFragment = new string[]
+        public static string[] arrowsFragment = new string[]
         {
             "#version 330 core\n",
             "flat in vec4 inColor;\n",
