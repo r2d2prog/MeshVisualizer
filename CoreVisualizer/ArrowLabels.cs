@@ -60,10 +60,6 @@ namespace CoreVisualizer
             Face.Dispose();
             Library.Dispose();
 
-            //var rX = mat4.RotateZ(glm.Radians(-90f));
-            //var rY = mat4.Identity;
-            //var rZ = mat4.RotateX(glm.Radians(90f));
-
             var sX = mat4.Scale(0.03f, 0.03f, 0.03f);
 
             var tX = mat4.Translate(new vec3(0.11f, -0.01f, 0.0f));
@@ -274,19 +270,10 @@ namespace CoreVisualizer
             "out float layer;\n",
             "void main()\n",
             "{\n",
-                //"vec4 mvPos = model * vec4(position, 0.0 ,1.0);\n",
-                //"vec3 dirZ = view[3].xyz - vec3(position, 0);\n",
-                //"dirZ = normalize(dirZ);\n",
-                //"vec3 upCam = vec3(view[1][0],view[1][1],view[1][2]);\n",
-                //"vec3 upCam = view[1].xyz;\n",
-                //"vec3 dirX = cross(dirZ, vec3(0,1,0));\n",
-                //"dirX = normalize(dirX);\n",
-                //"vec3 dirY = cross(dirZ, dirX);\n",
-                //"mat4 tMat = mat4(1.0);\n",
-                //"tMat[0].xyz = dirX;\n",
-                //"tMat[1].xyz = dirY;\n",
-                //"tMat[2].xyz = dirZ;\n",
-                "gl_Position = projection * view * model * vec4(position, 0.0, 1.0);\n",
+                "vec3 viewRight = vec3(view[0][0], view[1][0], view[2][0]);\n",
+                "vec3 viewUp = vec3(view[0][1], view[1][1], view[2][1]);\n",
+                "vec3 newPos = viewRight * position.x + viewUp * position.y;\n",
+                "gl_Position = projection * view * model * vec4(newPos, 1.0);\n",
                 "texCoords = position;\n",
                 "layer = float(gl_InstanceID);\n",
             "}\n",
