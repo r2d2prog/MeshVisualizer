@@ -41,6 +41,8 @@ namespace CoreVisualizer
             Horizontal
         }
 
+        public bool ShowWorldAxis {  get; set; } = true;
+
         public Grid(float aspectRatio, uint gridSize = 200)
         {
             if (gridSize != 0)
@@ -63,7 +65,8 @@ namespace CoreVisualizer
             Gl.DrawArrays(Gl.GL_LINES, ThinStart, ThinCount);
 
             Gl.LineWidth(ThickThickness);
-            Gl.DrawArrays(Gl.GL_LINES, ThickStart, ThickCount + OrtsCount);
+            var count = ShowWorldAxis ? ThickCount + OrtsCount : ThickCount;
+            Gl.DrawArrays(Gl.GL_LINES, ThickStart, count);
 
             Gl.BindVertexArray(0);
             Gl.UseProgram(0);
