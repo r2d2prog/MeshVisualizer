@@ -237,7 +237,6 @@
             this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.renderControl.Location = new System.Drawing.Point(0, 0);
             this.renderControl.Name = "renderControl";
-            this.renderControl.ShowGrid = true;
             this.renderControl.Size = new System.Drawing.Size(800, 401);
             this.renderControl.TabIndex = 0;
             // 

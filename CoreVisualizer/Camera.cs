@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace CoreVisualizer
 {
-    public class Camera
+    public class Camera : IDisposable
     {
+        private Arrows arrows;
+        private ArrowLabels arrowsLabels;
         public static float MouseWheelSens { get; set; } = 1f;
         public static float MouseSensX { get; set; } = 2f;
         public static float MouseSensY { get; set; } = 2f;
@@ -21,10 +23,33 @@ namespace CoreVisualizer
         public static mat4 Projection { get; set; }
         public static float Length { get; private set; }
         public static vec3 Target { get; set; }
+
+        public bool ShowAxises { get; set; } = true;
         public Camera(vec3 position, vec3 target, float aspectRatio)
         {
             ChangePosition(position, target);
             ChangePerspectiveProjection((float)Math.PI / 3, aspectRatio, 0.1f, 100f);
+            arrows = new Arrows();
+        }
+
+        public void Dispose()
+        {
+            arrows?.Dispose();
+            arrowsLabels?.Dispose();
+        }
+
+        public void PostInit()
+        {
+            arrowsLabels = new ArrowLabels();
+        }
+
+        public void DisplayAxises(ShaderProgramCreator arrowsProg, ShaderProgramCreator labelsProg)
+        {
+            if(ShowAxises)
+            {
+                arrows?.Draw(arrowsProg);
+                arrowsLabels?.Draw(labelsProg);
+            }
         }
 
         public void ChangePosition(vec3 position)

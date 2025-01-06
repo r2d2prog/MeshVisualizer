@@ -30,8 +30,6 @@ namespace CoreVisualizer
         private Arrows arrows;
         private ArrowLabels arrowLabels;
 
-        public bool ShowGrid { get; set; }
-
         public RenderControl()
         {
             InitializeComponent();
@@ -48,12 +46,6 @@ namespace CoreVisualizer
             DoRender();
         }
 
-        private void DrawGrid(object sender, RenderEventArgs args)
-        {
-            var backColor = new float[] { BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f };
-            grid.Draw(Programs["Grid"]);
-        }
-
         private void CreateShaderProgram(string key, string[] vSource, string[] fSource)
         {
             var program = new ShaderProgramCreator();
@@ -65,7 +57,7 @@ namespace CoreVisualizer
 
         public void PostInit()
         {
-            arrowLabels = new ArrowLabels();
+            camera?.PostInit();
         }
 
         private void OnInit(object sender, EventArgs e)
@@ -82,7 +74,7 @@ namespace CoreVisualizer
 
             camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
-            arrows = new Arrows();
+            //arrows = new Arrows();
             CreateShaderProgram("Grid", GridShaders.gridVertex, GridShaders.gridFragment);
             CreateShaderProgram("Arrows", ArrowShaders.arrowsVertex, ArrowShaders.arrowsFragment);
             CreateShaderProgram("Labels", ArrowLabelsShaders.labelsVertex, ArrowLabelsShaders.labelsFragment);
@@ -92,8 +84,9 @@ namespace CoreVisualizer
         private void OnDisposed(object sender, EventArgs e)
         {
             grid?.Dispose();
-            arrows?.Dispose();
-            arrowLabels?.Dispose();
+            camera?.Dispose();
+            //arrows?.Dispose();
+            //arrowLabels?.Dispose();
             foreach (var program in Programs)
                 program.Value.Dispose();
         }
@@ -104,10 +97,8 @@ namespace CoreVisualizer
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);//Режимы отображения будут позже
-            if (ShowGrid)
-                grid?.Draw(Programs["Grid"]);
-            arrows?.Draw(Programs["Arrows"]);
-            arrowLabels?.Draw(Programs["Labels"]);
+            grid?.Draw(Programs["Grid"]);
+            camera?.DisplayAxises(Programs["Arrows"], Programs["Labels"]);
         }
 
         private void OnResize(object sender, EventArgs e)
