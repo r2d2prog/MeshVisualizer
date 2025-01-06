@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="CoreVisualizer\CoreVisualizer.csproj">
-      <Project>{287B0695-6A1B-410F-BE0B-EBAD137149A9}</Project>
+      <Project>{287b0695-6a1b-410f-be0b-ebad137149a9}</Project>
       <Name>CoreVisualizer</Name>
     </ProjectReference>
   </ItemGroup>

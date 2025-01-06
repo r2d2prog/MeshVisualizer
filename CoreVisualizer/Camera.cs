@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace CoreVisualizer
 {
-    public class Camera
+    public class Camera : IDisposable
     {
+        private Arrows arrows;
+        private ArrowLabels arrowsLabels;
         public static float MouseWheelSens { get; set; } = 1f;
         public static float MouseSensX { get; set; } = 2f;
         public static float MouseSensY { get; set; } = 2f;
@@ -17,14 +19,37 @@ namespace CoreVisualizer
         public static float Far { get; private set; } = 100f;
         public static float FovY { get; private set; } = (float)Math.PI / 3;
         public static float AspectRatio { get; set; } = 1.0f;
-        public static mat4 View { get; private set; }
-        public static mat4 Projection { get; private set; }
+        public static mat4 View { get; set; }
+        public static mat4 Projection { get; set; }
         public static float Length { get; private set; }
         public static vec3 Target { get; set; }
+
+        public bool ShowAxises { get; set; } = true;
         public Camera(vec3 position, vec3 target, float aspectRatio)
         {
             ChangePosition(position, target);
             ChangePerspectiveProjection((float)Math.PI / 3, aspectRatio, 0.1f, 100f);
+            arrows = new Arrows();
+        }
+
+        public void Dispose()
+        {
+            arrows?.Dispose();
+            arrowsLabels?.Dispose();
+        }
+
+        public void PostInit()
+        {
+            arrowsLabels = new ArrowLabels();
+        }
+
+        public void DisplayAxises(ShaderProgramCreator arrowsProg, ShaderProgramCreator labelsProg)
+        {
+            if(ShowAxises)
+            {
+                arrows?.Draw(arrowsProg);
+                arrowsLabels?.Draw(labelsProg);
+            }
         }
 
         public void ChangePosition(vec3 position)
@@ -74,7 +99,7 @@ namespace CoreVisualizer
         public void Rotate(float deltaX, float deltaY, float deltaZ)
         {
             var mx = mat4.Rotate(deltaX, View.Row0.xyz);
-            var my = mat4.Rotate(deltaY, mx.Row1.xyz);
+            var my = mat4.Rotate(deltaY, vec3.UnitY);
             var negTarget = mat4.Translate(-Target);
             var target = mat4.Translate(Target);
             View = View * target * mx * my * negTarget;

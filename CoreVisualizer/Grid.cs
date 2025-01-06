@@ -40,6 +40,8 @@ namespace CoreVisualizer
             Vertical,
             Horizontal
         }
+        public bool Show { get; set; } = true;
+        public bool ShowWorldAxis {  get; set; } = true;
 
         public Grid(float aspectRatio, uint gridSize = 200)
         {
@@ -51,31 +53,26 @@ namespace CoreVisualizer
             }
         }
 
-        public ShaderProgramCreator CreateShaderProgram()
-        {
-            var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, GridShaders.gridVertex);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, GridShaders.gridFragment);
-            program.Link();
-            return program;
-        }
-
         public void Draw(ShaderProgramCreator program)
         {
-            Gl.UseProgram(program.Program);
-            Gl.BindVertexArray(VAO[0]);
+            if (Show)
+            {
+                Gl.UseProgram(program.Program);
+                Gl.BindVertexArray(VAO[0]);
 
-            program.SetUniform("perspective", Camera.Projection.ToArray());
-            program.SetUniform("view", Camera.View.ToArray());
+                program.SetUniform("perspective", Camera.Projection.ToArray());
+                program.SetUniform("view", Camera.View.ToArray());
 
-            Gl.LineWidth(ThinThickness);
-            Gl.DrawArrays(Gl.GL_LINES, ThinStart, ThinCount);
+                Gl.LineWidth(ThinThickness);
+                Gl.DrawArrays(Gl.GL_LINES, ThinStart, ThinCount);
 
-            Gl.LineWidth(ThickThickness);
-            Gl.DrawArrays(Gl.GL_LINES, ThickStart, ThickCount + OrtsCount);
+                Gl.LineWidth(ThickThickness);
+                var count = ShowWorldAxis ? ThickCount + OrtsCount : ThickCount;
+                Gl.DrawArrays(Gl.GL_LINES, ThickStart, count);
 
-            Gl.BindVertexArray(0);
-            Gl.UseProgram(0);
+                Gl.BindVertexArray(0);
+                Gl.UseProgram(0);
+            }
         }
 
         public void Dispose()

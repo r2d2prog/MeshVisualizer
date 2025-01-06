@@ -10,6 +10,5 @@ namespace CoreVisualizer.Interfaces
     {
         void DoRender();
         void AlignCamera(ViewPlane plane);
-        void ShowGrid(bool show);
     }
 }
