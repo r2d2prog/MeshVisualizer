@@ -17,6 +17,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gl = SharpGL.OpenGL;
+using System.Resources;
+using System.Reflection;
+using CoreVisualizer.Properties;
 
 namespace CoreVisualizer
 {
@@ -50,7 +53,6 @@ namespace CoreVisualizer
         public void PostInit()
         {
             camera?.PostInit();
-            CreateShaderProgramFromFiles("Mesh", "mesh.vs", "mesh.fs");
         }
 
         public void LoadModel(string path)
@@ -60,18 +62,11 @@ namespace CoreVisualizer
                 Models.Add(model.Names[i], model);
         }
 
-        private void CreateShaderProgramFromFiles(string key, string vFileName, string fFileName)
+        private void CreateShaderProgramFromResource(string key, string vertexKey, string fragmentKey)
         {
-            var path = Path.GetDirectoryName(Application.ExecutablePath);
-            var project = Directory.GetParent(path).Parent;
-            var shaderRoot = project.FullName + @"\CoreVisualizer\Shaders\";
-
-            var vertexPath = shaderRoot + vFileName;
-            var fragmentPath = shaderRoot + fFileName;
-
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromFile(Gl.GL_VERTEX_SHADER, vertexPath);
-            program.CreateShaderFromFile(Gl.GL_FRAGMENT_SHADER, fragmentPath);
+            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexKey);
+            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentKey);
             program.Link();
             Programs.Add(key, program);
         }
@@ -79,8 +74,8 @@ namespace CoreVisualizer
         private void CreateShaderProgramFromArrays(string key, string[] vSource, string[] fSource)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vSource);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fSource);
+            program.CreateShaderFromStringArray(Gl.GL_VERTEX_SHADER, vSource);
+            program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
             program.Link();
             Programs.Add(key, program);
         }
@@ -100,9 +95,10 @@ namespace CoreVisualizer
 
             camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
-            CreateShaderProgramFromArrays("Grid", GridShaders.gridVertex, GridShaders.gridFragment);
-            CreateShaderProgramFromArrays("Arrows", ArrowShaders.arrowsVertex, ArrowShaders.arrowsFragment);
-            CreateShaderProgramFromArrays("Labels", ArrowLabelsShaders.labelsVertex, ArrowLabelsShaders.labelsFragment);
+            CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
+            CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);
+            CreateShaderProgramFromResource("Labels", Resources.labels_vs, Resources.labels_fs);
+            CreateShaderProgramFromResource("Mesh", Resources.mesh_vs, Resources.mesh_fs);
             Disposed += OnDisposed;
         }
 
@@ -120,7 +116,7 @@ namespace CoreVisualizer
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             //Gl.Disable(Gl.GL_CULL_FACE);
-            //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);//Режимы отображения будут позже
+            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);//Режимы отображения будут позже
             foreach (var model in Models)
             {
                 model.Value.Draw(Programs["Mesh"]);

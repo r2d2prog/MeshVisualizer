@@ -54,7 +54,6 @@ namespace CoreVisualizer
                 var indices = scene.Meshes[i].GetIndices();
                 Indices[i] = indices.Length;
                 Points[i] = scene.Meshes[i].Vertices.Count;
-                //var faces = scene.Meshes[i].Faces;
                 var coords = scene.Meshes[i].Vertices.SelectMany(v => new float[] {v.X, v.Y, v.Z }).ToArray();
                 var colors = CreateColors(Color.Gray, Points[i]);
                 CreateVertexArray(indices, coords, colors, i);
@@ -72,7 +71,7 @@ namespace CoreVisualizer
             Marshal.FreeHGlobal(intPtr);
 
             Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[index]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords.ToArray(), Gl.GL_STATIC_DRAW);
+            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords, Gl.GL_STATIC_DRAW);
 
             Gl.EnableVertexAttribArray(0);
             Gl.VertexAttribPointer(0, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
@@ -126,13 +125,14 @@ namespace CoreVisualizer
 
         private float[] CreateColors(Color color, int count)
         {
-            float[] colors = new float[count * 4];
-            for (var i = 0; i < count; i+=4)
+            var stride = count * 4;
+            float[] colors = new float[stride];
+            for (var i = 0; i < stride; i+=4)
             {
                 colors[i] = color.R / 255f;
-                colors[i + 1] = color.R / 255f;
-                colors[i + 2] = color.R / 255f;
-                colors[i + 3] = color.R / 255f;
+                colors[i + 1] = color.G / 255f;
+                colors[i + 2] = color.B / 255f;
+                colors[i + 3] = color.A / 255f;
             }
             return colors;
         }

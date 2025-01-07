@@ -174,36 +174,4 @@ namespace CoreVisualizer
             Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, 0);
         }
     }
-
-    public class ArrowShaders
-    {
-        public static string[] arrowsVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec3 position;\n",
-            "layout (location = 1) in mat4 model;\n",
-            "uniform mat4 projection;\n",
-            "uniform mat4 view;\n",
-            "flat out vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "vec4 color[3];\n",
-                "color[0] = vec4(1.0, 0.0, 0.0, 1.0);\n",
-                "color[1] = vec4(0.0, 1.0, 0.0, 1.0);\n",
-                "color[2] = vec4(0.0, 0.0, 1.0, 1.0);\n",
-                "gl_Position = projection * view * model * vec4(position, 1.0);\n",
-                "inColor = color[gl_InstanceID];\n",
-            "}\n",
-        };
-
-        public static string[] arrowsFragment = new string[]
-        {
-            "#version 330 core\n",
-            "flat in vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_FragColor = inColor;\n",
-            "}\n"
-        };
-    }
 }

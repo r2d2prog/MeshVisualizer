@@ -256,44 +256,4 @@ namespace CoreVisualizer
             Gl.PixelStore(Gl.GL_UNPACK_ALIGNMENT, 4);
         }
     }
-
-    public class ArrowLabelsShaders
-    {
-        public static string[] labelsVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec2 position;\n",
-            "layout (location = 1) in mat4 model;\n",
-            "uniform mat4 projection;\n",
-            "uniform mat4 view;\n",
-            "out vec2 texCoords;\n",
-            "out float layer;\n",
-            "void main()\n",
-            "{\n",
-                "vec3 viewRight = vec3(view[0][0], view[1][0], view[2][0]);\n",
-                "vec3 viewUp = vec3(view[0][1], view[1][1], view[2][1]);\n",
-                "vec3 newPos = viewRight * position.x + viewUp * position.y;\n",
-                "gl_Position = projection * view * model * vec4(newPos, 1.0);\n",
-                "texCoords = position;\n",
-                "layer = float(gl_InstanceID);\n",
-            "}\n",
-        };
-
-        public static string[] labelsFragment = new string[]
-        {
-            "#version 330 core\n",
-            "in vec2 texCoords;\n",
-            "in float layer;\n",
-            "uniform sampler2DArray labels;\n",
-            "void main()\n",
-            "{\n",
-                "vec3 color[3];\n",
-                "color[0] = vec3(1.0, 0.0, 0.0);\n",
-                "color[1] = vec3(0.0, 1.0, 0.0);\n",
-                "color[2] = vec3(0.0, 0.0, 1.0);\n",
-                "float scale = texture(labels, vec3(texCoords.x, 1 - texCoords.y, layer)).r;\n",
-                "gl_FragColor = vec4(scale * color[int(layer)], scale);\n",
-            "}\n"
-        };
-    }
 }

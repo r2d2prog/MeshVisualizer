@@ -207,32 +207,4 @@ namespace CoreVisualizer
             Gl.BindVertexArray(0);
         }
     }
-
-    public class GridShaders
-    {
-        public static string[] gridVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec3 position;\n",
-            "layout(location = 1) in vec4 color;\n",
-            "uniform mat4 perspective;\n",
-            "uniform mat4 view;\n",
-            "flat out vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_Position = perspective * view * vec4(position, 1.0);\n",
-                "inColor = color;\n",
-            "}\n",
-        };
-
-        public static string[] gridFragment = new string[]
-        {
-            "#version 330 core\n",
-            "flat in vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_FragColor = inColor;\n",
-            "}\n"
-        };
-    }
 }

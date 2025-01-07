@@ -76,6 +76,11 @@
     <Compile Include="Interfaces\IVaoSurface.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RenderControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -90,11 +95,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\arrows.fs" />
+    <None Include="Shaders\arrows.vs" />
+    <None Include="Shaders\grid.fs" />
+    <None Include="Shaders\grid.vs" />
+    <None Include="Shaders\labels.fs" />
+    <None Include="Shaders\labels.vs" />
     <None Include="Shaders\mesh.fs" />
     <None Include="Shaders\mesh.vs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="RenderControl.resx">
       <DependentUpon>RenderControl.cs</DependentUpon>
     </EmbeddedResource>

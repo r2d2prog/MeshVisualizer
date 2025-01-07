@@ -30,7 +30,7 @@ namespace MeshVisualizer
         {
             openFileDialog1.Filter = "Kaydara (*.fbx)|*.fbx|Wavefront (*.obj)|*.obj|Glb (*.glb)|*.glb" +
                                      "|Stl (*.stl)|*.stl|All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 4;
+            openFileDialog1.FilterIndex = 2;
             if (openFileDialog1.ShowDialog() != DialogResult.Cancel)
             {
                 renderControl.LoadModel(openFileDialog1.FileName);

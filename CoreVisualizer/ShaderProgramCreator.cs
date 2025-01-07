@@ -1,8 +1,10 @@
-﻿using SharpGL;
+﻿using CoreVisualizer.Properties;
+using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -77,13 +79,20 @@ namespace CoreVisualizer
             {
                 data.Add(reader.ReadToEnd());
             }
-            CreateShaderFromString(type, data.ToArray());
+            CreateShaderFromStringArray(type, data.ToArray());
         }
 
-        public void CreateShaderFromString(uint type, string[] data)
+        public void CreateShaderFromStringArray(uint type, string[] data)
+        {
+            var source = string.Join("", data);
+            CreateShaderFromString(type, source);
+        }
+
+
+
+        public void CreateShaderFromString(uint type, string source)
         {
             var shader = Gl.CreateShader(type);
-            var source = string.Join("", data);
             Gl.ShaderSource(shader, source);
             try
             {
