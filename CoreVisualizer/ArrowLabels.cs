@@ -45,7 +45,7 @@ namespace CoreVisualizer
         public uint[] VertexBuffer { get; set; }
         public uint[] ColorBuffer { get; set; }
         public uint[] MatrixBuffer { get; set; }
-        public int Indices { get; set; }
+        public int[] Indices { get; set; }
         public mat4[] ModelMatrix { get; set; }
         public ArrowLabels() 
         {
@@ -73,10 +73,11 @@ namespace CoreVisualizer
             ModelMatrix = new mat4[] { xAxis, yAxis, zAxis };
 
             var indices = CreateIndices();
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
 
             var coords = CreateCoords();
-            CreateVertexArray(indices, coords, null);
+            CreateVertexArray(indices.ToArray(), coords.ToArray(), null);
         }
         public void Dispose()
         {
@@ -116,7 +117,7 @@ namespace CoreVisualizer
             Gl.Enable(Gl.GL_BLEND);
             Gl.BlendFunc((int)Gl.GL_SRC_ALPHA, (int)Gl.GL_ONE_MINUS_SRC_ALPHA);
 
-            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices, Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
+            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Gl.Disable(Gl.GL_BLEND);
             Camera.View = oldView;
@@ -125,7 +126,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(List<int> indices, List<float> coords, List<float> colors)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];
@@ -138,10 +139,9 @@ namespace CoreVisualizer
             Gl.BindVertexArray(VAO[0]);
             Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 
-            var indArray = indices.ToArray();
-            IntPtr intPtr = Marshal.AllocHGlobal(indArray.Length * sizeof(int));
-            Marshal.Copy(indArray, 0, intPtr, indArray.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indArray.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            IntPtr intPtr = Marshal.AllocHGlobal(indices.Length * sizeof(int));
+            Marshal.Copy(indices, 0, intPtr, indices.Length);
+            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
             Marshal.FreeHGlobal(intPtr);
 
             Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);

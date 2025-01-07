@@ -19,7 +19,7 @@ namespace CoreVisualizer
         public uint[] VertexBuffer { get; set; }
         public uint[] ColorBuffer { get; set; }
         public uint[] MatrixBuffer { get; set; }
-        public int Indices { get; set; }
+        public int[] Indices { get; set; }
         public mat4[] ModelMatrix { get; set; }
 
         public Arrows()
@@ -40,7 +40,6 @@ namespace CoreVisualizer
             ModelMatrix = new mat4[] { xAxis, yAxis, zAxis };
             List<int> indices = null, conIndices = null;
             List<float> coords = null, conCoords = null;
-            List<float> colors = null;
 
             Action<List<int>> getCylIndices = (l) => { indices = l; };
             Action<List<float>> getCylCoords = (l) => { coords = l; };
@@ -61,10 +60,11 @@ namespace CoreVisualizer
             var maxIndex = indices.Max() + 1;
             conIndices = conIndices.Select(v => v + maxIndex).ToList();
             indices.AddRange(conIndices);
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
 
             coords.AddRange(conCoords);
-            CreateVertexArray(indices, coords, colors);
+            CreateVertexArray(indices.ToArray(), coords.ToArray(), null);
         }
 
         public void Dispose()
@@ -98,7 +98,7 @@ namespace CoreVisualizer
             program.SetUniform("projection", Camera.Projection.ToArray());
             program.SetUniform("view", Camera.View.ToArray());
 
-            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices, Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
+            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Camera.View = oldView;
             Camera.Projection = oldProj;
@@ -106,7 +106,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(List<int> indices, List<float> coords, List<float> colors)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];

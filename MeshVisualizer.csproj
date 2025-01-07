@@ -82,6 +82,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="TestModels\691232f5448c_A_frog_that_spits_o.fbx" />
+    <None Include="TestModels\COCDRILE_HIGHT_OBJ.mtl" />
+    <None Include="TestModels\COCDRILE_HIGHT_OBJ.obj" />
+    <None Include="TestModels\Grenade.fbx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
