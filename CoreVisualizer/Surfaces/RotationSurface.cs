@@ -27,7 +27,7 @@ namespace CoreVisualizer
         public uint[] VertexBuffer { get; set; }
         public uint[] ColorBuffer { get; set; }
 
-        public int Indices { get; set; }
+        public int[] Indices { get; set; }
 
         public event Action<List<int>> getIndicesArray;
         public event Action<List<float>> getCoordsArray;
@@ -65,12 +65,13 @@ namespace CoreVisualizer
 
             CreateLateralIndices(indices,Stacks, Slices - 1);
             CreatePolusIndices(indices);
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
             if ((flags & CreateFlags.NoColor) != CreateFlags.NoColor)
                 CreateColors(colors, Color, coords.Count / 3);
             SendEvents(indices, coords, colors, flags);
             if ((flags & CreateFlags.GenerateVertexArray) == CreateFlags.GenerateVertexArray)
-                CreateVertexArray(indices, coords, colors);
+                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray());
         }
 
         public virtual void Draw(ShaderProgramCreator program)
@@ -84,13 +85,13 @@ namespace CoreVisualizer
             program.SetUniform("view", Camera.View.ToArray());
             program.SetUniform("model", ModelMatrix[0].ToArray());
 
-            Gl.DrawElements(Gl.GL_TRIANGLES, Indices, Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+            Gl.DrawElements(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
 
             Gl.BindVertexArray(0);
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(List<int> indices, List<float> coords, List<float> colors)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];
@@ -105,10 +106,9 @@ namespace CoreVisualizer
             Gl.BindVertexArray(VAO[0]);
             Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 
-            var indArray = indices.ToArray();
-            IntPtr intPtr = Marshal.AllocHGlobal(indArray.Length * sizeof(int));
-            Marshal.Copy(indArray, 0, intPtr, indArray.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indArray.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            IntPtr intPtr = Marshal.AllocHGlobal(indices.Length * sizeof(int));
+            Marshal.Copy(indices, 0, intPtr, indices.Length);
+            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
             Marshal.FreeHGlobal(intPtr);
 
             Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);

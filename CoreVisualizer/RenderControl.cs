@@ -1,6 +1,7 @@
 ﻿using CoreVisualizer.Interfaces;
 using GlmSharp;
 using SharpGL;
+using Assimp;
 using SharpGL.Enumerations;
 using SharpGL.SceneGraph.Lighting;
 using SharpGL.SceneGraph.Shaders;
@@ -9,12 +10,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gl = SharpGL.OpenGL;
+using System.Resources;
+using System.Reflection;
+using CoreVisualizer.Properties;
 
 namespace CoreVisualizer
 {
@@ -22,13 +27,12 @@ namespace CoreVisualizer
     {
         internal static OpenGL Gl { get; set; }
         private Dictionary<string, ShaderProgramCreator> Programs { get; set; }
+        private Dictionary<string, Model> Models { get; set; }
 
         private vec3 lastWorldPos;
         private Point lastMousePos;
         private Camera camera;
         private Grid grid;
-        private Arrows arrows;
-        private ArrowLabels arrowLabels;
 
         public RenderControl()
         {
@@ -46,18 +50,29 @@ namespace CoreVisualizer
             DoRender();
         }
 
-        private void CreateShaderProgram(string key, string[] vSource, string[] fSource)
+        public void LoadModel(string path)
+        {
+            var model = new Model(path);
+            for(var i = 0; i < model.Names.Length; ++i)
+                Models.Add(model.Names[i], model);
+        }
+
+        private void CreateShaderProgramFromResource(string key, string vertexKey, string fragmentKey)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vSource);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fSource);
+            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexKey);
+            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentKey);
             program.Link();
             Programs.Add(key, program);
         }
 
-        public void PostInit()
+        private void CreateShaderProgramFromArrays(string key, string[] vSource, string[] fSource)
         {
-            camera?.PostInit();
+            var program = new ShaderProgramCreator();
+            program.CreateShaderFromStringArray(Gl.GL_VERTEX_SHADER, vSource);
+            program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
+            program.Link();
+            Programs.Add(key, program);
         }
 
         private void OnInit(object sender, EventArgs e)
@@ -67,17 +82,18 @@ namespace CoreVisualizer
             glControl.OpenGLDraw += DrawScene;
 
             Programs = new Dictionary<string, ShaderProgramCreator>();
+            Models = new Dictionary<string, Model>();
 
             Gl.Enable(Gl.GL_DEPTH_TEST);
             Gl.DepthFunc(Gl.GL_LEQUAL);
             Gl.Enable(Gl.GL_LINE_SMOOTH);
 
-            camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
+            camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
-            //arrows = new Arrows();
-            CreateShaderProgram("Grid", GridShaders.gridVertex, GridShaders.gridFragment);
-            CreateShaderProgram("Arrows", ArrowShaders.arrowsVertex, ArrowShaders.arrowsFragment);
-            CreateShaderProgram("Labels", ArrowLabelsShaders.labelsVertex, ArrowLabelsShaders.labelsFragment);
+            CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
+            CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);
+            CreateShaderProgramFromResource("Labels", Resources.labels_vs, Resources.labels_fs);
+            CreateShaderProgramFromResource("Mesh", Resources.mesh_vs, Resources.mesh_fs);
             Disposed += OnDisposed;
         }
 
@@ -85,8 +101,6 @@ namespace CoreVisualizer
         {
             grid?.Dispose();
             camera?.Dispose();
-            //arrows?.Dispose();
-            //arrowLabels?.Dispose();
             foreach (var program in Programs)
                 program.Value.Dispose();
         }
@@ -96,7 +110,12 @@ namespace CoreVisualizer
             Gl.Viewport(0, 0, glControl.Width, glControl.Height);
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-            //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);//Режимы отображения будут позже
+            //Gl.Disable(Gl.GL_CULL_FACE);
+            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);//Режимы отображения будут позже
+            foreach (var model in Models)
+            {
+                model.Value.Draw(Programs["Mesh"]);
+            }
             grid?.Draw(Programs["Grid"]);
             camera?.DisplayAxises(Programs["Arrows"], Programs["Labels"]);
         }

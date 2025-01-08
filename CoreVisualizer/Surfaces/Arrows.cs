@@ -19,7 +19,7 @@ namespace CoreVisualizer
         public uint[] VertexBuffer { get; set; }
         public uint[] ColorBuffer { get; set; }
         public uint[] MatrixBuffer { get; set; }
-        public int Indices { get; set; }
+        public int[] Indices { get; set; }
         public mat4[] ModelMatrix { get; set; }
 
         public Arrows()
@@ -40,7 +40,6 @@ namespace CoreVisualizer
             ModelMatrix = new mat4[] { xAxis, yAxis, zAxis };
             List<int> indices = null, conIndices = null;
             List<float> coords = null, conCoords = null;
-            List<float> colors = null;
 
             Action<List<int>> getCylIndices = (l) => { indices = l; };
             Action<List<float>> getCylCoords = (l) => { coords = l; };
@@ -61,10 +60,11 @@ namespace CoreVisualizer
             var maxIndex = indices.Max() + 1;
             conIndices = conIndices.Select(v => v + maxIndex).ToList();
             indices.AddRange(conIndices);
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
 
             coords.AddRange(conCoords);
-            CreateVertexArray(indices, coords, colors);
+            CreateVertexArray(indices.ToArray(), coords.ToArray(), null);
         }
 
         public void Dispose()
@@ -98,7 +98,7 @@ namespace CoreVisualizer
             program.SetUniform("projection", Camera.Projection.ToArray());
             program.SetUniform("view", Camera.View.ToArray());
 
-            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices, Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
+            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Camera.View = oldView;
             Camera.Projection = oldProj;
@@ -106,7 +106,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(List<int> indices, List<float> coords, List<float> colors)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];
@@ -173,37 +173,5 @@ namespace CoreVisualizer
             Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, 0);
             Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, 0);
         }
-    }
-
-    public class ArrowShaders
-    {
-        public static string[] arrowsVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec3 position;\n",
-            "layout (location = 1) in mat4 model;\n",
-            "uniform mat4 projection;\n",
-            "uniform mat4 view;\n",
-            "flat out vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "vec4 color[3];\n",
-                "color[0] = vec4(1.0, 0.0, 0.0, 1.0);\n",
-                "color[1] = vec4(0.0, 1.0, 0.0, 1.0);\n",
-                "color[2] = vec4(0.0, 0.0, 1.0, 1.0);\n",
-                "gl_Position = projection * view * model * vec4(position, 1.0);\n",
-                "inColor = color[gl_InstanceID];\n",
-            "}\n",
-        };
-
-        public static string[] arrowsFragment = new string[]
-        {
-            "#version 330 core\n",
-            "flat in vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_FragColor = inColor;\n",
-            "}\n"
-        };
     }
 }

@@ -16,7 +16,6 @@ namespace MeshVisualizer
         public RenderForm()
         {
             InitializeComponent();
-            renderControl.PostInit();
         }
 
         private void OnAlignCamera(object sender, EventArgs e)
@@ -24,6 +23,18 @@ namespace MeshVisualizer
             var control = sender as ToolStripMenuItem;
             var plane = (ViewPlane)Enum.Parse(typeof(ViewPlane), control.Text);
             renderControl.AlignCamera(plane);
+        }
+
+        private void OnLoadModel(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Kaydara (*.fbx)|*.fbx|Wavefront (*.obj)|*.obj|Glb (*.glb)|*.glb" +
+                                     "|Stl (*.stl)|*.stl|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            if (openFileDialog1.ShowDialog() != DialogResult.Cancel)
+            {
+                renderControl.LoadModel(openFileDialog1.FileName);
+                renderControl.DoRender();
+            }
         }
     }
 }

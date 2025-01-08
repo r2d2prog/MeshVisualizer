@@ -37,6 +37,7 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.renderControl = new CoreVisualizer.RenderControl();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.перспективнаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,7 +50,7 @@
             this.xZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.yZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderControl = new CoreVisualizer.RenderControl();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -81,18 +82,19 @@
             // открытьToolStripMenuItem1
             // 
             this.открытьToolStripMenuItem1.Name = "открытьToolStripMenuItem1";
-            this.открытьToolStripMenuItem1.Size = new System.Drawing.Size(121, 22);
+            this.открытьToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.открытьToolStripMenuItem1.Text = "Открыть";
+            this.открытьToolStripMenuItem1.Click += new System.EventHandler(this.OnLoadModel);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(118, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // выходToolStripMenuItem
             // 
             this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.выходToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.выходToolStripMenuItem.Text = "Выход";
             // 
             // настройкиToolStripMenuItem
@@ -129,6 +131,15 @@
             // toolStripContainer1.TopToolStripPanel
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
+            // 
+            // renderControl
+            // 
+            this.renderControl.BackColor = System.Drawing.SystemColors.ControlText;
+            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl.Location = new System.Drawing.Point(0, 0);
+            this.renderControl.Name = "renderControl";
+            this.renderControl.Size = new System.Drawing.Size(800, 401);
+            this.renderControl.TabIndex = 0;
             // 
             // toolStrip1
             // 
@@ -231,14 +242,9 @@
             this.zYToolStripMenuItem.Text = "ZY";
             this.zYToolStripMenuItem.Click += new System.EventHandler(this.OnAlignCamera);
             // 
-            // renderControl
+            // openFileDialog1
             // 
-            this.renderControl.BackColor = System.Drawing.SystemColors.ControlText;
-            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderControl.Location = new System.Drawing.Point(0, 0);
-            this.renderControl.Name = "renderControl";
-            this.renderControl.Size = new System.Drawing.Size(800, 401);
-            this.renderControl.TabIndex = 0;
+            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // RenderForm
             // 
@@ -288,6 +294,7 @@
         private System.Windows.Forms.ToolStripMenuItem yZToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem zYToolStripMenuItem;
         private CoreVisualizer.RenderControl renderControl;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

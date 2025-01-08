@@ -9,8 +9,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CoreVisualizer.Properties;
 using GlmSharp;
-using SharpFont;
 using SharpGL;
 using SharpGL.SceneGraph.Lighting;
 using Gl = SharpGL.OpenGL;
@@ -24,20 +24,14 @@ namespace CoreVisualizer
 
         private struct BitmapData
         {
-            public int Width { get; set; }
-            public int Height { get; set; }
+            public Bitmap Bitmap { get; set; }
             public byte[] Data { get; set; }
-            public char Label { get; set; }
-            public BitmapData(char label)
+            public BitmapData(Bitmap bitmap)
             {
-                Width = 0;
-                Height = 0;
+                Bitmap = bitmap;
                 Data = null;
-                Label = label;
             }
         }
-        private Library Library {  get; set; }
-        private Face Face { get; set; }
         private uint[] Texture {  get; set; }
 
         public uint[] EBO { get; set; }
@@ -45,20 +39,21 @@ namespace CoreVisualizer
         public uint[] VertexBuffer { get; set; }
         public uint[] ColorBuffer { get; set; }
         public uint[] MatrixBuffer { get; set; }
-        public int Indices { get; set; }
+        public int[] Indices { get; set; }
         public mat4[] ModelMatrix { get; set; }
         public ArrowLabels() 
         {
+            /*
             Library = new Library();
             var fontsFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
             var path = fontsFolderPath + @"\sserife.fon";
             Face = Library.NewFace(path, 0);
-
+            */
             var data = CreateBitmapData();
             SetupTexture(data);
 
-            Face.Dispose();
-            Library.Dispose();
+            //Face.Dispose();
+            //Library.Dispose();
 
             var sX = mat4.Scale(0.03f, 0.03f, 0.03f);
 
@@ -73,17 +68,18 @@ namespace CoreVisualizer
             ModelMatrix = new mat4[] { xAxis, yAxis, zAxis };
 
             var indices = CreateIndices();
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
 
             var coords = CreateCoords();
-            CreateVertexArray(indices, coords, null);
+            CreateVertexArray(indices.ToArray(), coords.ToArray(), null);
         }
         public void Dispose()
         {
-            if(!Face.IsDisposed)
+            /*if(!Face.IsDisposed)
                 Face.Dispose();
             if(!Library.IsDisposed)
-                Library.Dispose();
+                Library.Dispose();*/
             if (MatrixBuffer != null)
                 Gl.DeleteBuffers(1, MatrixBuffer);
             Gl.DeleteTextures(Texture.Length, Texture);
@@ -116,7 +112,7 @@ namespace CoreVisualizer
             Gl.Enable(Gl.GL_BLEND);
             Gl.BlendFunc((int)Gl.GL_SRC_ALPHA, (int)Gl.GL_ONE_MINUS_SRC_ALPHA);
 
-            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices, Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
+            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Gl.Disable(Gl.GL_BLEND);
             Camera.View = oldView;
@@ -125,7 +121,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(List<int> indices, List<float> coords, List<float> colors)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];
@@ -138,10 +134,9 @@ namespace CoreVisualizer
             Gl.BindVertexArray(VAO[0]);
             Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 
-            var indArray = indices.ToArray();
-            IntPtr intPtr = Marshal.AllocHGlobal(indArray.Length * sizeof(int));
-            Marshal.Copy(indArray, 0, intPtr, indArray.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indArray.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            IntPtr intPtr = Marshal.AllocHGlobal(indices.Length * sizeof(int));
+            Marshal.Copy(indices, 0, intPtr, indices.Length);
+            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
             Marshal.FreeHGlobal(intPtr);
 
             Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);
@@ -199,9 +194,20 @@ namespace CoreVisualizer
 
         private BitmapData[] CreateBitmapData()
         {
-            var data = new BitmapData[] { new BitmapData('X'),new BitmapData('Y'), new BitmapData('Z') };
+            var data = new BitmapData[] { new BitmapData(Resources.X_Axis),new BitmapData(Resources.Y_Axis), new BitmapData(Resources.Z_Axis) };
             for (var i = 0; i < data.Length; ++i)
             {
+                var bitmap = data[i].Bitmap;
+                var bitmapData = bitmap.LockBits(new Rectangle(0,0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
+                var length = bitmapData.Stride * bitmapData.Height;
+
+                data[i].Data = new byte[length];
+                Marshal.Copy(bitmapData.Scan0, data[i].Data, 0, length);
+                bitmap.UnlockBits(bitmapData);
+
+
+
+                /*
                 Face.LoadChar(data[i].Label, LoadFlags.Default, LoadTarget.Normal);
 
                 var bmp = Face.Glyph.Bitmap;
@@ -229,71 +235,29 @@ namespace CoreVisualizer
                             pixels &= mask;
                         }
                     }
-                }
+                }*/
             }
             return data;
         }
 
         private void SetupTexture(BitmapData[] data)
         {
-            Gl.PixelStore(Gl.GL_UNPACK_ALIGNMENT, 1);
             Texture = new uint[1];
             Gl.GenTextures(1, Texture);
             
             Gl.BindTexture(Gl.GL_TEXTURE_2D_ARRAY, Texture[0]);
-            Gl.TexImage3D(Gl.GL_TEXTURE_2D_ARRAY, 0, (int)Gl.GL_RED, data[0].Width, data[0].Height, data.Length, 0, Gl.GL_RED, Gl.GL_UNSIGNED_BYTE, IntPtr.Zero);
+            Gl.TexImage3D(Gl.GL_TEXTURE_2D_ARRAY, 0, (int)Gl.GL_RGBA, data[0].Bitmap.Width, data[0].Bitmap.Height, data.Length, 0, Gl.GL_BGRA, Gl.GL_UNSIGNED_BYTE, IntPtr.Zero);
             for (var i = 0; i < data.Length; ++i)
             {
                 IntPtr ptr = Marshal.AllocHGlobal(data[i].Data.Length * sizeof(byte));
                 Marshal.Copy(data[i].Data, 0, ptr, data[i].Data.Length);
-                Gl.TexSubImage3D(Gl.GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, data[i].Width, data[i].Height, 1, Gl.GL_RED, Gl.GL_UNSIGNED_BYTE, ptr);
+                Gl.TexSubImage3D(Gl.GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, data[i].Bitmap.Width, data[i].Bitmap.Height, 1, Gl.GL_BGRA, Gl.GL_UNSIGNED_BYTE, ptr);
                 Marshal.FreeHGlobal(ptr);
             }
             Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_WRAP_S, Gl.GL_CLAMP);
             Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_WRAP_T, Gl.GL_CLAMP);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
-            Gl.PixelStore(Gl.GL_UNPACK_ALIGNMENT, 4);
+            Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_NEAREST);
+            Gl.TexParameter(Gl.GL_TEXTURE_2D_ARRAY, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_NEAREST);
         }
-    }
-
-    public class ArrowLabelsShaders
-    {
-        public static string[] labelsVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec2 position;\n",
-            "layout (location = 1) in mat4 model;\n",
-            "uniform mat4 projection;\n",
-            "uniform mat4 view;\n",
-            "out vec2 texCoords;\n",
-            "out float layer;\n",
-            "void main()\n",
-            "{\n",
-                "vec3 viewRight = vec3(view[0][0], view[1][0], view[2][0]);\n",
-                "vec3 viewUp = vec3(view[0][1], view[1][1], view[2][1]);\n",
-                "vec3 newPos = viewRight * position.x + viewUp * position.y;\n",
-                "gl_Position = projection * view * model * vec4(newPos, 1.0);\n",
-                "texCoords = position;\n",
-                "layer = float(gl_InstanceID);\n",
-            "}\n",
-        };
-
-        public static string[] labelsFragment = new string[]
-        {
-            "#version 330 core\n",
-            "in vec2 texCoords;\n",
-            "in float layer;\n",
-            "uniform sampler2DArray labels;\n",
-            "void main()\n",
-            "{\n",
-                "vec3 color[3];\n",
-                "color[0] = vec3(1.0, 0.0, 0.0);\n",
-                "color[1] = vec3(0.0, 1.0, 0.0);\n",
-                "color[2] = vec3(0.0, 0.0, 1.0);\n",
-                "float scale = texture(labels, vec3(texCoords.x, 1 - texCoords.y, layer)).r;\n",
-                "gl_FragColor = vec4(scale * color[int(layer)], scale);\n",
-            "}\n"
-        };
     }
 }

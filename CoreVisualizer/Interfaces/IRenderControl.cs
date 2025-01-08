@@ -10,5 +10,6 @@ namespace CoreVisualizer.Interfaces
     {
         void DoRender();
         void AlignCamera(ViewPlane plane);
+        void LoadModel(string path);
     }
 }

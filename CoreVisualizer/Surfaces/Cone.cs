@@ -31,14 +31,15 @@ namespace CoreVisualizer
 
             CreateLateralIndices(indices, Stacks - 1, Slices - 1);
             CreatePolusIndices(indices);
-            Indices = indices.Count;
+            Indices = new int[1];
+            Indices[0] = indices.Count;
 
             if((flags & CreateFlags.NoColor) != CreateFlags.NoColor)
                 CreateColors(colors, Color, coords.Count / 3);
 
             SendEvents(indices, coords, colors, flags);
             if ((flags & CreateFlags.GenerateVertexArray) == CreateFlags.GenerateVertexArray)
-                CreateVertexArray(indices, coords, colors);
+                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray());
         }
 
         protected override void CreateLateralSurface(List<float> coords)

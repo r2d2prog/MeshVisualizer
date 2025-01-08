@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\mesh3.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpGL">
       <HintPath>packages\SharpGL.3.1.1\lib\net472\SharpGL.dll</HintPath>
@@ -82,16 +85,19 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="TestModels\691232f5448c_A_frog_that_spits_o.fbx" />
+    <None Include="TestModels\COCDRILE_HIGHT_OBJ.mtl" />
+    <None Include="TestModels\COCDRILE_HIGHT_OBJ.obj" />
+    <None Include="TestModels\cube.mtl" />
+    <None Include="TestModels\cube.obj" />
+    <None Include="TestModels\Gray_Bunny_Sitting_1002130736.fbx" />
+    <None Include="TestModels\Grenade.fbx" />
+    <None Include="TestModels\Wolf_Profile_Illustra_1013133606.obj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\camera.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\mesh.ico" />
-    <Content Include="Resources\mesh2.ico" />
     <Content Include="Resources\mesh3.ico" />
   </ItemGroup>
   <ItemGroup>
