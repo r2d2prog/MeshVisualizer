@@ -90,7 +90,9 @@
     <None Include="TestModels\COCDRILE_HIGHT_OBJ.obj" />
     <None Include="TestModels\cube.mtl" />
     <None Include="TestModels\cube.obj" />
+    <None Include="TestModels\Gray_Bunny_Sitting_1002130736.fbx" />
     <None Include="TestModels\Grenade.fbx" />
+    <None Include="TestModels\Wolf_Profile_Illustra_1013133606.obj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
