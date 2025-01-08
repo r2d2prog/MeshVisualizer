@@ -39,7 +39,7 @@ namespace CoreVisualizer
 
             SendEvents(indices, coords, colors, flags);
             if ((flags & CreateFlags.GenerateVertexArray) == CreateFlags.GenerateVertexArray)
-                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray());
+                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray(), null, null, null);
         }
 
         protected override void CreateLateralSurface(List<float> coords)

@@ -66,7 +66,7 @@ namespace CoreVisualizer
             ChangePosition(position);
         }
 
-        public vec3 GetWorldPosition()
+        public static vec3 GetWorldPosition()
         {
             var vec = -View.Column3;
             var mat = View.Transposed;

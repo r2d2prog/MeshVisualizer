@@ -71,7 +71,7 @@ namespace CoreVisualizer
                 CreateColors(colors, Color, coords.Count / 3);
             SendEvents(indices, coords, colors, flags);
             if ((flags & CreateFlags.GenerateVertexArray) == CreateFlags.GenerateVertexArray)
-                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray());
+                CreateVertexArray(indices.ToArray(), coords.ToArray(), colors.ToArray(), null, null, null);
         }
 
         public virtual void Draw(ShaderProgramCreator program)
@@ -91,7 +91,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, float[] uvs, float[] normals, float[] tangents, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];

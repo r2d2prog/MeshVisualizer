@@ -53,15 +53,15 @@ namespace CoreVisualizer
         public void LoadModel(string path)
         {
             var model = new Model(path);
-            for(var i = 0; i < model.Names.Length; ++i)
-                Models.Add(model.Names[i], model);
+            var modelName = Path.GetFileNameWithoutExtension(path);
+            Models.Add(modelName, model);
         }
 
-        private void CreateShaderProgramFromResource(string key, string vertexKey, string fragmentKey)
+        private void CreateShaderProgramFromResource(string key, string vertexSource, string fragmentSource)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexKey);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentKey);
+            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexSource);
+            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentSource);
             program.Link();
             Programs.Add(key, program);
         }
@@ -73,6 +73,28 @@ namespace CoreVisualizer
             program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
             program.Link();
             Programs.Add(key, program);
+        }
+
+        private void CreateMeshTexturedProgram()
+        {
+            var sbVertex = new StringBuilder(Resources.mesh_vs);
+            var sbFragment = new StringBuilder(Resources.mesh_fs);
+            sbVertex.Replace("#define USE_MATERIAL", "#define USE_TEXTURES");
+            sbFragment.Replace("#define USE_MATERIAL", "#define USE_TEXTURES");
+
+            var tsProgram = new ShaderProgramCreator();
+            tsProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
+            tsProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
+            tsProgram.Link();
+            Programs.Add("MeshTangentSpace", tsProgram);
+
+            sbVertex.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
+            sbFragment.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
+            var msProgram = new ShaderProgramCreator();
+            msProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
+            msProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
+            msProgram.Link();
+            Programs.Add("MeshModelSpace", msProgram);
         }
 
         private void OnInit(object sender, EventArgs e)
@@ -93,7 +115,8 @@ namespace CoreVisualizer
             CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
             CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);
             CreateShaderProgramFromResource("Labels", Resources.labels_vs, Resources.labels_fs);
-            CreateShaderProgramFromResource("Mesh", Resources.mesh_vs, Resources.mesh_fs);
+            CreateShaderProgramFromResource("MeshMaterial", Resources.mesh_vs, Resources.mesh_fs);
+            CreateMeshTexturedProgram();
             Disposed += OnDisposed;
         }
 
@@ -101,6 +124,8 @@ namespace CoreVisualizer
         {
             grid?.Dispose();
             camera?.Dispose();
+            foreach (var model in Models.Values)
+                model.Dispose();
             foreach (var program in Programs)
                 program.Value.Dispose();
         }
@@ -114,7 +139,8 @@ namespace CoreVisualizer
             Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);//Режимы отображения будут позже
             foreach (var model in Models)
             {
-                model.Value.Draw(Programs["Mesh"]);
+                
+                model.Value.Draw(Programs);
             }
             grid?.Draw(Programs["Grid"]);
             camera?.DisplayAxises(Programs["Arrows"], Programs["Labels"]);
@@ -130,7 +156,7 @@ namespace CoreVisualizer
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                lastWorldPos = camera.GetWorldPosition();
+                lastWorldPos = Camera.GetWorldPosition();
             lastMousePos = e.Location;
         }
 
@@ -139,7 +165,7 @@ namespace CoreVisualizer
             if (e.Button == MouseButtons.Right)
             {
                 var dir = Camera.Target - lastWorldPos;
-                Camera.Target = camera.GetWorldPosition() + dir;
+                Camera.Target = Camera.GetWorldPosition() + dir;
             }
         }
 
