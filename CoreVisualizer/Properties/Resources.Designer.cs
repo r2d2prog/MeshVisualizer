@@ -209,5 +209,35 @@ namespace CoreVisualizer.Properties {
                 return ResourceManager.GetString("mesh_vs", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap X_Axis {
+            get {
+                object obj = ResourceManager.GetObject("X_Axis", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Y_Axis {
+            get {
+                object obj = ResourceManager.GetObject("Y_Axis", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Z_Axis {
+            get {
+                object obj = ResourceManager.GetObject("Z_Axis", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

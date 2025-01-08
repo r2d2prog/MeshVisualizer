@@ -30,17 +30,13 @@ namespace CoreVisualizer
             ChangePosition(position, target);
             ChangePerspectiveProjection((float)Math.PI / 3, aspectRatio, 0.1f, 100f);
             arrows = new Arrows();
+            arrowsLabels = new ArrowLabels();
         }
 
         public void Dispose()
         {
             arrows?.Dispose();
             arrowsLabels?.Dispose();
-        }
-
-        public void PostInit()
-        {
-            arrowsLabels = new ArrowLabels();
         }
 
         public void DisplayAxises(ShaderProgramCreator arrowsProg, ShaderProgramCreator labelsProg)

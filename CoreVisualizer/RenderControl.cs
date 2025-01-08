@@ -50,11 +50,6 @@ namespace CoreVisualizer
             DoRender();
         }
 
-        public void PostInit()
-        {
-            camera?.PostInit();
-        }
-
         public void LoadModel(string path)
         {
             var model = new Model(path);
@@ -93,7 +88,7 @@ namespace CoreVisualizer
             Gl.DepthFunc(Gl.GL_LEQUAL);
             Gl.Enable(Gl.GL_LINE_SMOOTH);
 
-            camera = new Camera(new vec3(0.0f, 0.0f, 1.0f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
+            camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
             CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
             CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);

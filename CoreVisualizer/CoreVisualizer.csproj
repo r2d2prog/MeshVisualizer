@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\SharpFont.4.0.1\build\SharpFont.props" Condition="Exists('..\packages\SharpFont.4.0.1\build\SharpFont.props')" />
-  <Import Project="..\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props" Condition="Exists('..\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -40,9 +38,6 @@
     </Reference>
     <Reference Include="GlmSharp, Version=0.9.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GlmSharp.0.9.8\lib\Net45\GlmSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpFont, Version=4.0.1.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpFont.4.0.1\lib\net45\SharpFont.dll</HintPath>
     </Reference>
     <Reference Include="SharpGL, Version=3.1.1.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpGL.3.1.1\lib\net472\SharpGL.dll</HintPath>
@@ -115,6 +110,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Y_Axis.png" />
+    <None Include="Resources\Z_Axis.png" />
+    <Content Include="Resources\X_Axis.png" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
   </ItemGroup>
@@ -123,8 +121,6 @@
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props'))" />
-    <Error Condition="!Exists('..\packages\SharpFont.4.0.1\build\SharpFont.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpFont.4.0.1\build\SharpFont.props'))" />
     <Error Condition="!Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssimpNet.4.1.0\build\AssimpNet.targets'))" />
   </Target>
   <Import Project="..\packages\AssimpNet.4.1.0\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" />
