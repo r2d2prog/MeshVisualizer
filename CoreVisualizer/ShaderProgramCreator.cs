@@ -32,10 +32,12 @@ namespace CoreVisualizer
 
         public void BindTexture(string name, uint target, uint texId, uint texUnit)
         {
+            var err = Gl.GetError();
             Gl.ActiveTexture(Gl.GL_TEXTURE0 + texUnit);
             Gl.BindTexture(target, texId);
             var id = Gl.GetUniformLocation(Program, name);
             Gl.Uniform1(id, (int)texUnit);
+            err = Gl.GetError();
         }
 
         public void SetCustomAttributes(uint buffer, string variable)
@@ -68,6 +70,8 @@ namespace CoreVisualizer
                 Gl.Uniform3(id, values[0], values[1], values[2]);
             else if (count == 4)
                 Gl.Uniform4(id, values[0], values[1], values[2], values[3]);
+            else if (count == 9)
+                Gl.UniformMatrix3(id, 1, false, values);
             else
                 Gl.UniformMatrix4(id, 1, false, values);//Передача матрицы в шейдер
         }

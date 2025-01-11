@@ -72,7 +72,7 @@ namespace CoreVisualizer
             Indices[0] = indices.Count;
 
             var coords = CreateCoords();
-            CreateVertexArray(indices.ToArray(), coords.ToArray(), null);
+            CreateVertexArray(indices.ToArray(), coords.ToArray(), null, null, null, null);
         }
         public void Dispose()
         {
@@ -121,7 +121,7 @@ namespace CoreVisualizer
             Gl.UseProgram(0);
         }
 
-        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0)
+        public void CreateVertexArray(int[] indices, float[] coords, float[] colors, float[] uvs, float[] normals, float[] tangents, int index = 0)
         {
             VAO = new uint[1];
             EBO = new uint[1];

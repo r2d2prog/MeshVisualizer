@@ -42,12 +42,14 @@ namespace CoreVisualizer
         }
         public bool Show { get; set; } = true;
         public bool ShowWorldAxis {  get; set; } = true;
+        public static float WorldUnit {  get; set; }
 
         public Grid(float aspectRatio, uint gridSize = 200)
         {
             if (gridSize != 0)
             {
                 var modelHalfHeight = Math.Sqrt(3) / 3 * 0.1f;
+                WorldUnit = (float)modelHalfHeight * 2;
                 var modelHalfWidth = aspectRatio * modelHalfHeight;
                 CreateLines((float)modelHalfWidth, gridSize);
             }

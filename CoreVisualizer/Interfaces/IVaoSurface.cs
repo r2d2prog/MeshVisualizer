@@ -15,8 +15,8 @@ namespace CoreVisualizer
         uint[] ColorBuffer { get; set; }
         int[] Indices { get; set; }
         mat4[] ModelMatrix { get; set; }
-        void CreateVertexArray(int[] indices, float[] coords, float[] colors, int index = 0);
-        void Draw(ShaderProgramCreator program);
+        void CreateVertexArray(int[] indices, float[] coords, float[] colors, float[] uvs, float[] normals, float[] tangents, int index = 0);
+        //void Draw(ShaderProgramCreator program);
     }
 
     [Flags]
