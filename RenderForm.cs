@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -33,6 +34,20 @@ namespace MeshVisualizer
             if (openFileDialog1.ShowDialog() != DialogResult.Cancel)
             {
                 renderControl.LoadModel(openFileDialog1.FileName);
+                renderControl.DoRender();
+            }
+        }
+
+        private void OnRasterModeChange(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            var checkState = control.Checked;
+            control.Checked = !checkState;
+            if(renderControl.ActiveModel != null)
+            {
+                var id = int.Parse(control.Tag.ToString());
+                var mode = (RasterizationMode)id;
+                renderControl.ActiveModel.SetRasterizationMode(mode, control.Checked);
                 renderControl.DoRender();
             }
         }

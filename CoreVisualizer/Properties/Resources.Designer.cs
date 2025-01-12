@@ -139,12 +139,12 @@ namespace CoreVisualizer.Properties {
         ///uniform sampler2DArray labels;
         ///void main()
         ///{
-        ///	vec3 color[3];
+        ///    vec3 color[3];
         ///    color[0] = vec3(1.0, 0.0, 0.0);
         ///    color[1] = vec3(0.0, 1.0, 0.0);
         ///    color[2] = vec3(0.0, 0.0, 1.0);
-        ///    float scale = texture(labels, vec3(texCoords.x, 1 - texCoords.y, layer)).r;
-        ///    gl_FragColor = vec4(scale * color[int(layer)], scale);
+        ///    vec4 texColor = texture(labels, vec3(texCoords.x, texCoords.y, layer));
+        ///    gl_FragColor = texColor;
         ///}.
         /// </summary>
         internal static string labels_fs {
@@ -178,11 +178,32 @@ namespace CoreVisualizer.Properties {
         
         /// <summary>
         ///   Ищет локализованную строку, похожую на #version 330 core
-        ///flat in vec4 inColor;
-        ///void main()
+        ///#define USE_MATERIAL
+        ///#define TANGENT_SPACE
+        ///
+        ///uniform sampler2D diffuse;
+        ///uniform sampler2D normal;
+        ///uniform sampler2D shininess;
+        ///
+        ///uniform vec4 ambientColor;
+        ///uniform vec4 diffuseColor;
+        ///uniform vec4 specularColor;
+        ///uniform vec4 emmisiveColor; 
+        ///uniform float shinStrength;
+        ///
+        ///in VS_OUT
         ///{
-        ///    gl_FragColor = inColor;
-        ///}.
+        ///    vec4 inColor;
+        ///    vec2 inUvs;
+        ///    vec3 tangentLightDir;
+        ///    vec3 tangentViewPos;
+        ///    vec3 tangentFragPos;
+        ///    #if defined(MODEL_SPACE)
+        ///        vec3 tNormal;
+        ///    #endif
+        ///}fs_in;
+        ///
+        ///void mai [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string mesh_fs {
             get {
@@ -192,21 +213,65 @@ namespace CoreVisualizer.Properties {
         
         /// <summary>
         ///   Ищет локализованную строку, похожую на #version 330 core
+        ///#define USE_MATERIAL
+        ///#define TANGENT_SPACE
         ///layout (location = 0) in vec3 position;
         ///layout (location = 1) in vec4 color;
+        ///layout (location = 2) in vec2 uvs;
+        ///layout (location = 3) in vec3 normal;
+        ///layout (location = 4) in vec3 tangent;
+        ///
         ///uniform mat4 projection;
         ///uniform mat4 view;
         ///uniform mat4 model;
-        ///flat out vec4 inColor;
-        ///void main()
-        ///{
-        ///    gl_Position = projection * view * model * vec4(position, 1.0);
-        ///    inColor = color;
-        ///}.
+        ///uniform mat3 normalMatrix;
+        ///
+        ///uniform vec3 lightDir;
+        ///uniform vec4 lightColor;
+        ///uniform vec3 viewPos;
+        ///
+        ///uniform vec4 ambientColor;
+        ///uniform vec4 diffuseColor;
+        ///uniform vec4 specularCol [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string mesh_vs {
             get {
                 return ResourceManager.GetString("mesh_vs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на version 330 core
+        ///uniform vec4 color;
+        ///void main()
+        ///{
+        ///    gl_FragColor = color;
+        ///}.
+        /// </summary>
+        internal static string primitive_fs {
+            get {
+                return ResourceManager.GetString("primitive_fs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на version 330 core
+        ///layout (location = 0) in vec3 position;
+        ///layout (location = 1) in vec3 color;
+        ///layout (location = 2) in vec3 uvs;
+        ///layout (location = 3) in vec3 normal;
+        ///layout (location = 4) in vec3 tangent;
+        ///uniform mat4 view;
+        ///uniform mat4 model;
+        ///uniform mat4 projection;
+        ///void main()
+        ///{
+        ///	gl_Position = projection * view * model * vec4(position, 1.0);
+        ///}.
+        /// </summary>
+        internal static string primitive_vs {
+            get {
+                return ResourceManager.GetString("primitive_vs", resourceCulture);
             }
         }
         
