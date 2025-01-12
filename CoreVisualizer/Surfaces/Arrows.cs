@@ -98,6 +98,7 @@ namespace CoreVisualizer
             program.SetUniform("projection", Camera.Projection.ToArray());
             program.SetUniform("view", Camera.View.ToArray());
 
+            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
             Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Camera.View = oldView;

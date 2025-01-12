@@ -39,19 +39,24 @@ void main()
     vec3 fragPos = vec3(model * vec4(position, 1.0));  
     vs_out.inUvs = uvs;
     #if defined(USE_MATERIAL)
-        vec3 ambient = vec3(lightColor * ambientColor);
+        #if defined(DIFFUSE_ONLY)
+            vs_out.inColor = diffuseColor;
+            gl_Position = projection * view * model * vec4(position, 1.0);
+        #else
+            vec3 ambient = vec3(lightColor * ambientColor);
 
-        vec3 norm = normalize(normal);
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = vec3(lightColor * (diff * diffuseColor));
+            vec3 norm = normalize(normal);
+            float diff = max(dot(norm, lightDir), 0.0);
+            vec3 diffuse = vec3(lightColor * (diff * diffuseColor));
 
-        vec3 viewDir = normalize(viewPos - fragPos);
-        vec3 reflectDir = reflect(-lightDir, norm);  
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), round(shinStrength * 0.5));
-        vec3 specular = vec3(lightColor * (spec * specularColor));  
+            vec3 viewDir = normalize(viewPos - fragPos);
+            vec3 reflectDir = reflect(-lightDir, norm);  
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), round(shinStrength * 0.5));
+            vec3 specular = vec3(lightColor * (spec * specularColor));  
 
-        vec3 result = ambient + diffuse + specular;
-        vs_out.inColor = vec4(result,1);
+            vec3 result = ambient + diffuse + specular;
+            vs_out.inColor = vec4(result,1);
+        #endif
     #else
         vec3 N = normalize(normalMatrix * normal);
         #if defined(TANGENT_SPACE)

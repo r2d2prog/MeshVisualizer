@@ -13,6 +13,8 @@ using System.IO;
 using Assimp.Configs;
 using System.Drawing.Imaging;
 using System.Reflection;
+using SharpGL.SceneGraph;
+using System.Windows.Forms;
 
 namespace CoreVisualizer
 {
@@ -31,12 +33,14 @@ namespace CoreVisualizer
         public int[] Points { get; set; }
         public MeshTexture[][] Textures { get; set; }
         public MeshMaterial[] Materials { get; set; }
+        public RasterizationMode[] RasterizationModes { get; set; }
         public mat4[] ModelMatrix { get; set; }
         public bool IsModelMatrixUniform { get; set; } = true;
         public BoundingBox[] BoundingBoxes { get; private set; }
         public string[] Names { get; private set; }
         public static bool AutoSize { get; set; } = true;
-
+        public static Color4D LineColor { get; set; } = new Color4D(0.0f, 1.0f, 0.0f, 1.0f);
+        public static Color4D PointColor { get; set; } = new Color4D(1.0f, 1.0f, 0.0f, 1.0f);
         public Model(string path)
         {
             var context = new AssimpContext();
@@ -53,10 +57,12 @@ namespace CoreVisualizer
             Indices = new int[scene.MeshCount];
             Textures = new MeshTexture[scene.MeshCount][];
             Materials = new MeshMaterial[scene.MeshCount];
+            RasterizationModes = new RasterizationMode[scene.MeshCount];
             ModelMatrix = new mat4[scene.MeshCount];
             Names = new string[scene.MeshCount];
             Points = new int[scene.MeshCount];
             BoundingBoxes = new BoundingBox[scene.MeshCount];
+            
 
             Gl.GenVertexArrays(scene.MeshCount, VAO);
             Gl.GenBuffers(scene.MeshCount, EBO);
@@ -93,7 +99,8 @@ namespace CoreVisualizer
                 if(mesh.HasTangentBasis)
                     tangents = mesh.Tangents.SelectMany(v => new float[] { v.X, v.Y, v.Z }).ToArray();
                 CreateTextures(material, i, path);
-                float[] colors = /*Textures[i] == null ? CreateColors(Color.Gray, Points[i]) :*/ null;
+                RasterizationModes[i] = RasterizationMode.Shaded;
+                float[] colors = null;
                 CreateVertexArray(indices, coords, colors, uvs, normals, tangents, i);
             }
         }
@@ -179,43 +186,88 @@ namespace CoreVisualizer
                 for (var i = 0; i < VAO.Length; i++)
                 {
                     if (VAO[i] != 0)
-                    {
-                        ShaderProgramCreator program;
-                        if(Textures[i] == null)
-                           program = programs["MeshMaterial"];
-                        else
-                        {
-                            var nt = Textures[i].Where(v => v.UniformName == "normal").ToArray();
-                            program = nt.Length > 0 ? programs["MeshTangentSpace"] : programs["MeshModelSpace"];
-                        }
-                        
-                        Gl.UseProgram(program.Program);
-                        Gl.BindVertexArray(VAO[i]);
-
-                        PassMatrices(program, i);
-                        PassMaterial(program, i);
-
-                        program.SetUniform("lightDir", new float[] { 0, 0, -1 });
-                        program.SetUniform("lightColor", new float[] { 0.5f, 0.5f, 0.5f, 1f });
-                        program.SetUniform("viewPos", Camera.GetWorldPosition().ToArray());
-                        var normalMatrix = IsModelMatrixUniform? new mat3(ModelMatrix[i]) : new mat3(ModelMatrix[i]).Inverse.Transposed;
-                        program.SetUniform("normalMatrix", normalMatrix.ToArray());
-                        if (Textures[i] != null)
-                        {
-                            for (var j = 0; j < Textures[i].Length; ++j)
-                            {
-                                var texture = Textures[i][j];
-                                if (texture.TextureId != null)
-                                    program.BindTexture(texture.UniformName, Gl.GL_TEXTURE_2D, texture.TextureId[0], texture.Slot);
-                            }
-                        }
-                        Gl.DrawElements(Gl.GL_TRIANGLES, Indices[i], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
-
-                        Gl.BindVertexArray(0);
-                        Gl.UseProgram(0);
-                    }
+                        Draw(programs, i);
                 }
             }
+        }
+
+        public void SetRasterizationMode(RasterizationMode mode, bool checkState)
+        {
+            if (checkState)
+                for (var i = 0; i < RasterizationModes.Length; ++i)
+                {
+                    RasterizationModes[i] |= mode;
+                    var b = 0;
+                }
+            else
+                for (var i = 0; i < RasterizationModes.Length; ++i)
+                {
+                    RasterizationModes[i] &= ~mode;
+                    var a = 0;
+                }
+        }
+
+        private void Draw(Dictionary<string, ShaderProgramCreator> programs, int index)
+        {
+            var oldMaterial = Materials[index];
+            Gl.BindVertexArray(VAO[index]);
+            if ((RasterizationModes[index] & RasterizationMode.Shaded) != RasterizationMode.None)
+            {
+                ShaderProgramCreator program;
+                if (Textures[index] == null)
+                    program = programs["MeshMaterial"];
+                else
+                {
+                    var nt = Textures[index].Where(v => v.UniformName == "normal").ToArray();
+                    program = nt.Length > 0 ? programs["MeshTangentSpace"] : programs["MeshModelSpace"];
+                }
+
+                Gl.UseProgram(program.Program);
+                PassMatrices(program, index);
+                PassMaterial(program, index);
+
+                program.SetUniform("lightDir", new float[] { 0, 0, -1 });
+                program.SetUniform("lightColor", new float[] { 0.5f, 0.5f, 0.5f, 1f });
+                program.SetUniform("viewPos", Camera.GetWorldPosition().ToArray());
+                var normalMatrix = IsModelMatrixUniform ? new mat3(ModelMatrix[index]) : new mat3(ModelMatrix[index]).Inverse.Transposed;
+                program.SetUniform("normalMatrix", normalMatrix.ToArray());
+                if (Textures[index] != null)
+                {
+                    for (var j = 0; j < Textures[index].Length; ++j)
+                    {
+                        var texture = Textures[index][j];
+                        if (texture.TextureId != null)
+                            program.BindTexture(texture.UniformName, Gl.GL_TEXTURE_2D, texture.TextureId[0], texture.Slot);
+                    }
+                }
+                Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
+                Gl.DrawElements(Gl.GL_TRIANGLES, Indices[index], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+            }
+            if ((RasterizationModes[index] & RasterizationMode.Wireframe) != RasterizationMode.None)
+                DrawInWireframeOrPointMode(programs["PrimitiveRasterization"], Gl.GL_LINE, index, LineColor);
+
+            if ((RasterizationModes[index] & RasterizationMode.Points) != RasterizationMode.None)
+                DrawInWireframeOrPointMode(programs["PrimitiveRasterization"], Gl.GL_POINT, index, PointColor);
+            Materials[index] = oldMaterial;
+        }
+
+        private void SetDiffuseMaterial(int index, Color4D color)
+        {
+            var oldMaterial = Materials[index];
+            Materials[index] = new MeshMaterial(oldMaterial.Shininess);
+            Materials[index].SetColor(Materials[index].Diffuse, color);
+        }
+
+        private void DrawInWireframeOrPointMode(ShaderProgramCreator program, uint rasterMode, int index, Color4D color)
+        {
+            Gl.UseProgram(program.Program);
+            Gl.PointSize(2.5f);
+            PassMatrices(program, index);
+            SetDiffuseMaterial(index, color);
+            program.SetUniform("color", Materials[index].Diffuse);
+            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, rasterMode);
+            Gl.DrawElements(Gl.GL_TRIANGLES, Indices[index], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+            Gl.PointSize(1.0f);
         }
 
         private void PassMatrices(ShaderProgramCreator program, int index)
@@ -227,7 +279,6 @@ namespace CoreVisualizer
 
         private void PassMaterial(ShaderProgramCreator program, int index)
         {
-            //new float[] {0.2f, 0.2f, 0.2f, 1.0f }
             program.SetUniform("ambientColor", /*Materials[index].Ambient*/new float[] { 0.2f, 0.2f, 0.2f, 1.0f });
             program.SetUniform("diffuseColor", Materials[index].Diffuse);
             program.SetUniform("specularColor", Materials[index].Specular);
@@ -324,4 +375,32 @@ namespace CoreVisualizer
             return colors;
         }
     }
+
+
+    public class NoDiffuse
+    {
+        public static string vertexNoDiffuse =
+            "#version 330 core\n" +
+            "layout (location = 0) in vec3 position;\n" +
+            "layout (location = 1) in vec3 color;\n" +
+            "layout (location = 2) in vec3 uvs;\n" +
+            "layout (location = 3) in vec3 normal;\n" +
+            "layout (location = 4) in vec3 tangent;\n" +
+            "uniform mat4 view;\n" +
+            "uniform mat4 model;\n" +
+            "uniform mat4 projection;\n" +
+            "void main()\n" +
+            "{\n" +
+            "   gl_Position = projection * view * model * vec4(position, 1.0);\n" +
+            "}";
+
+        public static string fragmentNoDiffuse =
+            "#version 330 core\n" +
+            "uniform vec4 color;\n" +
+            "void main()\n" +
+            "{\n" +
+            "   gl_FragColor = color;\n" +
+            "}";
+        
+    } 
 }

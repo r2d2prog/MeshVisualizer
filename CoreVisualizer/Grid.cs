@@ -59,6 +59,7 @@ namespace CoreVisualizer
         {
             if (Show)
             {
+                Gl.Enable(Gl.GL_LINE_SMOOTH);
                 Gl.UseProgram(program.Program);
                 Gl.BindVertexArray(VAO[0]);
 
@@ -72,6 +73,8 @@ namespace CoreVisualizer
                 var count = ShowWorldAxis ? ThickCount + OrtsCount : ThickCount;
                 Gl.DrawArrays(Gl.GL_LINES, ThickStart, count);
 
+                Gl.LineWidth(1.0f);
+                Gl.Disable(Gl.GL_LINE_SMOOTH);
                 Gl.BindVertexArray(0);
                 Gl.UseProgram(0);
             }

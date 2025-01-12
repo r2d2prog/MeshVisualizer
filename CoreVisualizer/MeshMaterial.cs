@@ -40,12 +40,27 @@ namespace CoreVisualizer
             SetColor(Emissive, material.ColorEmissive);
             SetColor(Reflective, material.ColorReflective);
         }
+        
+        public MeshMaterial(float shininess = 0)
+        {
+            Ambient = new float[4];
+            Diffuse = new float[4];
+            Specular = new float[4];
+            Emissive = new float[4];
+            Reflective = new float[4];
+            Shininess = shininess;
+        }
 
         public void SetColor(float[] data, Color4D color)
         {
-            var result = new float[4];
             for(var i = 0; i < 4; ++i)
                 data[i] = color[i];
+        }
+
+        public void SetColor(float[] dst, float[] src)
+        {
+            for (var i = 0; i < 4; ++i)
+                dst[i] = src[i];
         }
     }
 }

@@ -43,17 +43,8 @@ namespace CoreVisualizer
         public mat4[] ModelMatrix { get; set; }
         public ArrowLabels() 
         {
-            /*
-            Library = new Library();
-            var fontsFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-            var path = fontsFolderPath + @"\sserife.fon";
-            Face = Library.NewFace(path, 0);
-            */
             var data = CreateBitmapData();
             SetupTexture(data);
-
-            //Face.Dispose();
-            //Library.Dispose();
 
             var sX = mat4.Scale(0.03f, 0.03f, 0.03f);
 
@@ -76,10 +67,6 @@ namespace CoreVisualizer
         }
         public void Dispose()
         {
-            /*if(!Face.IsDisposed)
-                Face.Dispose();
-            if(!Library.IsDisposed)
-                Library.Dispose();*/
             if (MatrixBuffer != null)
                 Gl.DeleteBuffers(1, MatrixBuffer);
             Gl.DeleteTextures(Texture.Length, Texture);
@@ -112,6 +99,7 @@ namespace CoreVisualizer
             Gl.Enable(Gl.GL_BLEND);
             Gl.BlendFunc((int)Gl.GL_SRC_ALPHA, (int)Gl.GL_ONE_MINUS_SRC_ALPHA);
 
+            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
             Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
 
             Gl.Disable(Gl.GL_BLEND);

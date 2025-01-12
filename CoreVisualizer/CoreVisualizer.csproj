@@ -79,6 +79,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RasterizationMode.cs" />
     <Compile Include="RenderControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -101,6 +102,8 @@
     <None Include="Shaders\labels.vs" />
     <None Include="Shaders\mesh.fs" />
     <None Include="Shaders\mesh.vs" />
+    <None Include="Shaders\primitive.fs" />
+    <None Include="Shaders\primitive.vs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

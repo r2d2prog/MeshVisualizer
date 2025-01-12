@@ -34,6 +34,8 @@ namespace CoreVisualizer
         private Camera camera;
         private Grid grid;
 
+        public Model ActiveModel {  get; set; }
+
         public RenderControl()
         {
             InitializeComponent();
@@ -55,6 +57,16 @@ namespace CoreVisualizer
             var model = new Model(path);
             var modelName = Path.GetFileNameWithoutExtension(path);
             Models.Add(modelName, model);
+            ActiveModel = model;
+        }
+
+        public IEnumerable<string> GetModelNames() => Models.Keys;
+
+        public Model GetModel(string name)
+        {
+            if(Models.ContainsKey(name)) 
+                return Models[name];
+            return null;
         }
 
         private void CreateShaderProgramFromResource(string key, string vertexSource, string fragmentSource)
@@ -73,6 +85,12 @@ namespace CoreVisualizer
             program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
             program.Link();
             Programs.Add(key, program);
+        }
+
+        private void CreateMeshMaterialProgram()
+        {
+            CreateShaderProgramFromResource("MeshMaterial", Resources.mesh_vs, Resources.mesh_fs);
+            CreateShaderProgramFromResource("PrimitiveRasterization", Resources.primitive_vs, Resources.primitive_fs);
         }
 
         private void CreateMeshTexturedProgram()
@@ -108,14 +126,13 @@ namespace CoreVisualizer
 
             Gl.Enable(Gl.GL_DEPTH_TEST);
             Gl.DepthFunc(Gl.GL_LEQUAL);
-            Gl.Enable(Gl.GL_LINE_SMOOTH);
 
             camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
             CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
             CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);
             CreateShaderProgramFromResource("Labels", Resources.labels_vs, Resources.labels_fs);
-            CreateShaderProgramFromResource("MeshMaterial", Resources.mesh_vs, Resources.mesh_fs);
+            CreateMeshMaterialProgram();
             CreateMeshTexturedProgram();
             Disposed += OnDisposed;
         }
@@ -135,11 +152,9 @@ namespace CoreVisualizer
             Gl.Viewport(0, 0, glControl.Width, glControl.Height);
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-            //Gl.Disable(Gl.GL_CULL_FACE);
-            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);//Режимы отображения будут позже
             foreach (var model in Models)
             {
-                
+                //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
                 model.Value.Draw(Programs);
             }
             grid?.Draw(Programs["Grid"]);
