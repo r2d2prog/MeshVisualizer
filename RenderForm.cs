@@ -9,14 +9,20 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GlmSharp;
+using SharpGL;
 
 namespace MeshVisualizer
 {
     public partial class RenderForm : Form
     {
+        private vec3 mousePoint;
+        private LightingControl directionalLight;
+        
         public RenderForm()
         {
             InitializeComponent();
+            directionalLight = new LightingControl();
         }
 
         private void OnAlignCamera(object sender, EventArgs e)
@@ -48,6 +54,41 @@ namespace MeshVisualizer
                 var id = int.Parse(control.Tag.ToString());
                 var mode = (RasterizationMode)id;
                 renderControl.ActiveModel.SetRasterizationMode(mode, control.Checked);
+                renderControl.DoRender();
+            }
+        }
+
+        private void OnRedrawLightDirection(object sender, PaintEventArgs e)
+        {
+            directionalLight.DrawLightDirection(e.Graphics);
+        }
+
+        private void SetLightDirection(vec3 direction, int index = 0)
+        {
+            renderControl.RenderHandler.DirectionalLights[index].Direction = direction;
+        }
+
+        private void OnChangeLightDirection(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                mousePoint = new vec3(e.Location.X, e.Location.Y, 1);
+                if (directionalLight.CalculateLightDirection(mousePoint))
+                {
+                    SetLightDirection(directionalLight.LightDirection3D);
+                    toolStripLabel1.Invalidate();
+                    renderControl.DoRender();
+                }
+            }
+        }
+
+        private void OnChangeLightHemisphere(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                directionalLight.ChangeLightHemisphere();
+                SetLightDirection(mousePoint);
+                toolStripLabel1.Invalidate();
                 renderControl.DoRender();
             }
         }

@@ -81,11 +81,6 @@ namespace CoreVisualizer
                 Indices[i] = indices.Length;
                 Points[i] = scene.Meshes[i].Vertices.Count;
                 var coords = ConvertCoords(scene.Meshes[i].Vertices, i);
-                if (scene.MeshCount == 1 && AutoSize)
-                {
-                    var scaleFactor = Grid.WorldUnit / BoundingBoxes[0].MaxSize();
-                    ModelMatrix[0] = ModelMatrix[0] * mat4.Scale(scaleFactor * 4);
-                }
                 var mI = mesh.MaterialIndex;
                 var material = scene.Materials[mI];
                 Materials[i] = new MeshMaterial(material);
@@ -102,6 +97,11 @@ namespace CoreVisualizer
                 RasterizationModes[i] = RasterizationMode.Shaded;
                 float[] colors = null;
                 CreateVertexArray(indices, coords, colors, uvs, normals, tangents, i);
+            }
+            if (scene.MeshCount == 1 && AutoSize)
+            {
+                var scaleFactor = Grid.WorldUnit / BoundingBoxes[0].MaxSize();
+                ModelMatrix[0] = ModelMatrix[0] * mat4.Scale(scaleFactor * 4);
             }
         }
 
@@ -179,14 +179,14 @@ namespace CoreVisualizer
             }
         }
 
-        public void Draw(Dictionary<string, ShaderProgramCreator> programs)
+        public void Draw(RenderHandler handler)
         {
             if (VAO != null)
             {
                 for (var i = 0; i < VAO.Length; i++)
                 {
                     if (VAO[i] != 0)
-                        Draw(programs, i);
+                        Draw(handler, i);
                 }
             }
         }
@@ -195,19 +195,13 @@ namespace CoreVisualizer
         {
             if (checkState)
                 for (var i = 0; i < RasterizationModes.Length; ++i)
-                {
                     RasterizationModes[i] |= mode;
-                    var b = 0;
-                }
             else
                 for (var i = 0; i < RasterizationModes.Length; ++i)
-                {
                     RasterizationModes[i] &= ~mode;
-                    var a = 0;
-                }
         }
 
-        private void Draw(Dictionary<string, ShaderProgramCreator> programs, int index)
+        private void Draw(RenderHandler handler, int index)
         {
             var oldMaterial = Materials[index];
             Gl.BindVertexArray(VAO[index]);
@@ -215,19 +209,19 @@ namespace CoreVisualizer
             {
                 ShaderProgramCreator program;
                 if (Textures[index] == null)
-                    program = programs["MeshMaterial"];
+                    program = handler.Programs["MeshMaterial"];
                 else
                 {
                     var nt = Textures[index].Where(v => v.UniformName == "normal").ToArray();
-                    program = nt.Length > 0 ? programs["MeshTangentSpace"] : programs["MeshModelSpace"];
+                    program = nt.Length > 0 ? handler.Programs["MeshTangentSpace"] : handler.Programs["MeshModelSpace"];
                 }
 
                 Gl.UseProgram(program.Program);
                 PassMatrices(program, index);
                 PassMaterial(program, index);
 
-                program.SetUniform("lightDir", new float[] { 0, 0, -1 });
-                program.SetUniform("lightColor", new float[] { 0.5f, 0.5f, 0.5f, 1f });
+                program.SetUniform("lightDir", handler.DirectionalLights[0].Direction.ToArray());
+                program.SetUniform("lightColor", handler.DirectionalLights[0].Color.ToArray());
                 program.SetUniform("viewPos", Camera.GetWorldPosition().ToArray());
                 var normalMatrix = IsModelMatrixUniform ? new mat3(ModelMatrix[index]) : new mat3(ModelMatrix[index]).Inverse.Transposed;
                 program.SetUniform("normalMatrix", normalMatrix.ToArray());
@@ -244,10 +238,10 @@ namespace CoreVisualizer
                 Gl.DrawElements(Gl.GL_TRIANGLES, Indices[index], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
             }
             if ((RasterizationModes[index] & RasterizationMode.Wireframe) != RasterizationMode.None)
-                DrawInWireframeOrPointMode(programs["PrimitiveRasterization"], Gl.GL_LINE, index, LineColor);
+                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], Gl.GL_LINE, index, LineColor);
 
             if ((RasterizationModes[index] & RasterizationMode.Points) != RasterizationMode.None)
-                DrawInWireframeOrPointMode(programs["PrimitiveRasterization"], Gl.GL_POINT, index, PointColor);
+                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], Gl.GL_POINT, index, PointColor);
             Materials[index] = oldMaterial;
         }
 

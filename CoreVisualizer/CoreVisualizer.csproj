@@ -67,6 +67,7 @@
     <Compile Include="ArrowLabels.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="DirectionalLight.cs" />
     <Compile Include="MeshTexture.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Interfaces\IRenderControl.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="RenderControl.Designer.cs">
       <DependentUpon>RenderControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="RenderHandler.cs" />
     <Compile Include="ShaderProgramCreator.cs" />
     <Compile Include="Surfaces\Arrows.cs" />
     <Compile Include="Surfaces\Cone.cs" />
