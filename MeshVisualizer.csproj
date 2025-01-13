@@ -36,6 +36,9 @@
     <ApplicationIcon>Resources\mesh3.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GlmSharp, Version=0.9.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\GlmSharp.0.9.8\lib\Net45\GlmSharp.dll</HintPath>
+    </Reference>
     <Reference Include="SharpGL">
       <HintPath>packages\SharpGL.3.1.1\lib\net472\SharpGL.dll</HintPath>
     </Reference>
@@ -55,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LightingControl.cs" />
     <Compile Include="RenderForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,6 +80,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -98,6 +103,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\light_dir.bmp" />
     <Content Include="Resources\mesh3.ico" />
   </ItemGroup>
   <ItemGroup>

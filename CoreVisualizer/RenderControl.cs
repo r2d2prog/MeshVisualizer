@@ -26,15 +26,16 @@ namespace CoreVisualizer
     public partial class RenderControl : UserControl , IRenderControl
     {
         internal static OpenGL Gl { get; set; }
-        private Dictionary<string, ShaderProgramCreator> Programs { get; set; }
         private Dictionary<string, Model> Models { get; set; }
 
         private vec3 lastWorldPos;
         private Point lastMousePos;
         private Camera camera;
         private Grid grid;
+        private DirectionalLight[] lights;
 
         public Model ActiveModel {  get; set; }
+        public RenderHandler RenderHandler { get; private set; }
 
         public RenderControl()
         {
@@ -75,7 +76,7 @@ namespace CoreVisualizer
             program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexSource);
             program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentSource);
             program.Link();
-            Programs.Add(key, program);
+            RenderHandler.Programs.Add(key, program);
         }
 
         private void CreateShaderProgramFromArrays(string key, string[] vSource, string[] fSource)
@@ -84,7 +85,7 @@ namespace CoreVisualizer
             program.CreateShaderFromStringArray(Gl.GL_VERTEX_SHADER, vSource);
             program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
             program.Link();
-            Programs.Add(key, program);
+            RenderHandler.Programs.Add(key, program);
         }
 
         private void CreateMeshMaterialProgram()
@@ -104,7 +105,7 @@ namespace CoreVisualizer
             tsProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
             tsProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
             tsProgram.Link();
-            Programs.Add("MeshTangentSpace", tsProgram);
+            RenderHandler.Programs.Add("MeshTangentSpace", tsProgram);
 
             sbVertex.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
             sbFragment.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
@@ -112,7 +113,7 @@ namespace CoreVisualizer
             msProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
             msProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
             msProgram.Link();
-            Programs.Add("MeshModelSpace", msProgram);
+            RenderHandler.Programs.Add("MeshModelSpace", msProgram);
         }
 
         private void OnInit(object sender, EventArgs e)
@@ -121,7 +122,8 @@ namespace CoreVisualizer
             glControl.MouseWheel += OnMouseWheel;
             glControl.OpenGLDraw += DrawScene;
 
-            Programs = new Dictionary<string, ShaderProgramCreator>();
+            RenderHandler = new RenderHandler();
+            //Programs = new Dictionary<string, ShaderProgramCreator>();
             Models = new Dictionary<string, Model>();
 
             Gl.Enable(Gl.GL_DEPTH_TEST);
@@ -129,11 +131,15 @@ namespace CoreVisualizer
 
             camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
+
             CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
             CreateShaderProgramFromResource("Arrows", Resources.arrows_vs, Resources.arrows_fs);
             CreateShaderProgramFromResource("Labels", Resources.labels_vs, Resources.labels_fs);
             CreateMeshMaterialProgram();
             CreateMeshTexturedProgram();
+
+            //lights = new DirectionalLight[2];
+            //lights[0] = new DirectionalLight(-vec3.UnitZ, new vec4(0.5f,0.5f,0.5f,1.0f));
             Disposed += OnDisposed;
         }
 
@@ -143,7 +149,7 @@ namespace CoreVisualizer
             camera?.Dispose();
             foreach (var model in Models.Values)
                 model.Dispose();
-            foreach (var program in Programs)
+            foreach (var program in RenderHandler.Programs)
                 program.Value.Dispose();
         }
 
@@ -154,11 +160,10 @@ namespace CoreVisualizer
             Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
             foreach (var model in Models)
             {
-                //Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_LINE);
-                model.Value.Draw(Programs);
+                model.Value.Draw(RenderHandler);
             }
-            grid?.Draw(Programs["Grid"]);
-            camera?.DisplayAxises(Programs["Arrows"], Programs["Labels"]);
+            grid?.Draw(RenderHandler.Programs["Grid"]);
+            camera?.DisplayAxises(RenderHandler.Programs["Arrows"], RenderHandler.Programs["Labels"]);
         }
 
         private void OnResize(object sender, EventArgs e)
