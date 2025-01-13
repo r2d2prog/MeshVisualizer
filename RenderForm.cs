@@ -87,7 +87,7 @@ namespace MeshVisualizer
             if (e.Button == MouseButtons.Right)
             {
                 directionalLight.ChangeLightHemisphere();
-                SetLightDirection(mousePoint);
+                SetLightDirection(directionalLight.LightDirection3D);
                 toolStripLabel1.Invalidate();
                 renderControl.DoRender();
             }
