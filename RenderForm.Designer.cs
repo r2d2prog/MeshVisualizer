@@ -37,7 +37,6 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.renderControl = new CoreVisualizer.RenderControl();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.перспективнаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,9 +54,16 @@
             this.сеткаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.точкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.xYToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.yXToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.zXToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.xZToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.yZToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.zYToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderControl = new CoreVisualizer.RenderControl();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -140,16 +146,6 @@
             this.toolStripContainer1.TopToolStripPanel.BackColor = System.Drawing.SystemColors.Control;
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.toolStrip1);
             // 
-            // renderControl
-            // 
-            this.renderControl.ActiveModel = null;
-            this.renderControl.BackColor = System.Drawing.SystemColors.ControlText;
-            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderControl.Location = new System.Drawing.Point(0, 0);
-            this.renderControl.Name = "renderControl";
-            this.renderControl.Size = new System.Drawing.Size(800, 375);
-            this.renderControl.TabIndex = 0;
-            // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
@@ -164,7 +160,7 @@
             this.toolStripLabel1});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(457, 51);
+            this.toolStrip1.Size = new System.Drawing.Size(439, 51);
             this.toolStrip1.TabIndex = 0;
             // 
             // toolStripDropDownButton1
@@ -310,12 +306,6 @@
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 51);
             // 
-            // toolStripLabel2
-            // 
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(83, 48);
-            this.toolStripLabel2.Text = "Освещение 1:";
-            // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.AutoSize = false;
@@ -328,6 +318,71 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.xYToolStripMenuItem1,
+            this.yXToolStripMenuItem1,
+            this.zXToolStripMenuItem1,
+            this.xZToolStripMenuItem1,
+            this.yZToolStripMenuItem1,
+            this.zYToolStripMenuItem1});
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(96, 48);
+            this.toolStripLabel2.Text = "Освещение 1:";
+            // 
+            // xYToolStripMenuItem1
+            // 
+            this.xYToolStripMenuItem1.Name = "xYToolStripMenuItem1";
+            this.xYToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.xYToolStripMenuItem1.Text = "XY";
+            this.xYToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // yXToolStripMenuItem1
+            // 
+            this.yXToolStripMenuItem1.Name = "yXToolStripMenuItem1";
+            this.yXToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.yXToolStripMenuItem1.Text = "YX";
+            this.yXToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // zXToolStripMenuItem1
+            // 
+            this.zXToolStripMenuItem1.Name = "zXToolStripMenuItem1";
+            this.zXToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.zXToolStripMenuItem1.Text = "ZX";
+            this.zXToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // xZToolStripMenuItem1
+            // 
+            this.xZToolStripMenuItem1.Name = "xZToolStripMenuItem1";
+            this.xZToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.xZToolStripMenuItem1.Text = "XZ";
+            this.xZToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // yZToolStripMenuItem1
+            // 
+            this.yZToolStripMenuItem1.Name = "yZToolStripMenuItem1";
+            this.yZToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.yZToolStripMenuItem1.Text = "YZ";
+            this.yZToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // zYToolStripMenuItem1
+            // 
+            this.zYToolStripMenuItem1.Name = "zYToolStripMenuItem1";
+            this.zYToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.zYToolStripMenuItem1.Text = "ZY";
+            this.zYToolStripMenuItem1.Click += new System.EventHandler(this.OnAlignLighting);
+            // 
+            // renderControl
+            // 
+            this.renderControl.ActiveModel = null;
+            this.renderControl.BackColor = System.Drawing.SystemColors.ControlText;
+            this.renderControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.renderControl.Location = new System.Drawing.Point(0, 0);
+            this.renderControl.Name = "renderControl";
+            this.renderControl.Size = new System.Drawing.Size(800, 375);
+            this.renderControl.TabIndex = 0;
             // 
             // RenderForm
             // 
@@ -384,7 +439,13 @@
         private System.Windows.Forms.ToolStripMenuItem точкиToolStripMenuItem;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripLabel2;
+        private System.Windows.Forms.ToolStripMenuItem xYToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem yXToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem zXToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem xZToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem yZToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem zYToolStripMenuItem1;
     }
 }
 
