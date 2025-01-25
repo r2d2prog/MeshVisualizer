@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using Assimp;
-using SharpGL;
-using Gl = SharpGL.OpenGL;
 
 namespace CoreVisualizer
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct MeshMaterial
     {
-        private static OpenGL Gl = RenderControl.Gl;
         [FieldOffset(0)]
         public float[] Ambient;
         [FieldOffset(16)]

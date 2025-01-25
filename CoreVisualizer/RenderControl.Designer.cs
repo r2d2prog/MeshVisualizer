@@ -28,40 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.glControl = new SharpGL.OpenGLControl();
-            ((System.ComponentModel.ISupportInitialize)(this.glControl)).BeginInit();
+            this.glControl = new OpenGL.GlControl();
             this.SuspendLayout();
             // 
             // glControl
             // 
+            this.glControl.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.glControl.ColorBits = ((uint)(24u));
+            this.glControl.DepthBits = ((uint)(16u));
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glControl.DrawFPS = false;
             this.glControl.Location = new System.Drawing.Point(0, 0);
+            this.glControl.MultisampleBits = ((uint)(0u));
             this.glControl.Name = "glControl";
-            this.glControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL3_3;
-            this.glControl.RenderContextType = SharpGL.RenderContextType.NativeWindow;
-            this.glControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
-            this.glControl.Size = new System.Drawing.Size(150, 150);
+            this.glControl.Size = new System.Drawing.Size(600, 400);
+            this.glControl.StencilBits = ((uint)(8u));
             this.glControl.TabIndex = 0;
-            this.glControl.OpenGLInitialized += new System.EventHandler(this.OnInit);
-            this.glControl.Resized += new System.EventHandler(this.OnResize);
+            this.glControl.Load += new System.EventHandler(this.OnInit);
             this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove);
             this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnMouseUp);
             // 
             // RenderControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.glControl);
             this.Name = "RenderControl";
-            ((System.ComponentModel.ISupportInitialize)(this.glControl)).EndInit();
+            this.Size = new System.Drawing.Size(600, 400);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private SharpGL.OpenGLControl glControl;
+        private OpenGL.GlControl glControl;
     }
 }

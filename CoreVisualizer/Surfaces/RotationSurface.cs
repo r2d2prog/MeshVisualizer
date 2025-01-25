@@ -1,19 +1,15 @@
 ﻿using GlmSharp;
-using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Gl = SharpGL.OpenGL;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public abstract class RotationSurface : IVaoSurface
     {
-        protected static OpenGL Gl = RenderControl.Gl;
         protected int Slices { get; private set; }
         protected int Stacks { get; private set; }
         protected vec3 LocalCenter { get; set; }
@@ -45,10 +41,10 @@ namespace CoreVisualizer
 
         public void Dispose()
         {
-            Gl.DeleteBuffers(1, ColorBuffer);
-            Gl.DeleteBuffers(1, VertexBuffer);
-            Gl.DeleteBuffers(1, EBO);
-            Gl.DeleteVertexArrays(1, VAO);
+            Gl.DeleteBuffers(ColorBuffer);
+            Gl.DeleteBuffers(VertexBuffer);
+            Gl.DeleteBuffers(EBO);
+            Gl.DeleteVertexArrays(VAO);
         }
 
         public virtual void Create(CreateFlags flags = CreateFlags.GenerateVertexArray)
@@ -85,7 +81,7 @@ namespace CoreVisualizer
             program.SetUniform("view", Camera.View.ToArray());
             program.SetUniform("model", ModelMatrix[0].ToArray());
 
-            Gl.DrawElements(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+            Gl.DrawElements(PrimitiveType.Triangles, Indices[0], DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             Gl.BindVertexArray(0);
             Gl.UseProgram(0);
@@ -98,34 +94,34 @@ namespace CoreVisualizer
             VertexBuffer = new uint[1];
             ColorBuffer = new uint[1];
 
-            Gl.GenVertexArrays(1, VAO);
-            Gl.GenBuffers(1, EBO);
-            Gl.GenBuffers(1, VertexBuffer);
-            Gl.GenBuffers(1, ColorBuffer);
+            Gl.GenVertexArrays(VAO);
+            Gl.GenBuffers(EBO);
+            Gl.GenBuffers(VertexBuffer);
+            Gl.GenBuffers(ColorBuffer);
 
             Gl.BindVertexArray(VAO[0]);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, EBO[0]);
 
             IntPtr intPtr = Marshal.AllocHGlobal(indices.Length * sizeof(int));
             Marshal.Copy(indices, 0, intPtr, indices.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            Gl.BufferData(BufferTarget.ElementArrayBuffer, (uint)indices.Length * sizeof(int), intPtr, BufferUsage.StaticDraw);
             Marshal.FreeHGlobal(intPtr);
 
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords.ToArray(), Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, VertexBuffer[0]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)coords.Length * sizeof(float), coords.ToArray(), BufferUsage.StaticDraw);
 
             Gl.EnableVertexAttribArray(0);
-            Gl.VertexAttribPointer(0, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, ColorBuffer[0]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, colors.ToArray(), Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, ColorBuffer[0]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)colors.Length * sizeof(float), colors.ToArray(), BufferUsage.StaticDraw);
 
             Gl.EnableVertexAttribArray(1);
-            Gl.VertexAttribPointer(1, 4, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(1, 4, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
             Gl.BindVertexArray(0);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, 0);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, 0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
         protected void CreatePolusPoints(List<float> coords)
@@ -148,7 +144,6 @@ namespace CoreVisualizer
 
         protected void CreateLateralIndices(List<int> indices, int stacks, int slices)
         {
-            //var slicesDec = Slices - 1;
             var lastRow = 0;
             for (var i = 0; i < stacks; ++i)
             {
@@ -177,7 +172,6 @@ namespace CoreVisualizer
         protected void CreatePolusIndices(List<int> indices, int indexPolus, FanTriangles fan)
         {
             var slicesDec = Slices - 1;
-            //var indexPolus = Slices * (Stacks + 1);
             if (fan == FanTriangles.Up)
             {
                 var first = indexPolus - Slices;
@@ -250,34 +244,5 @@ namespace CoreVisualizer
             CreatePolusIndices(indices, Slices * (Stacks + 1), FanTriangles.Up);
             CreatePolusIndices(indices, Slices * (Stacks + 1) + 1, FanTriangles.Down);
         }
-    }
-
-    public class RotationSurfaceShaders
-    {
-        public static string[] surfaceVertex = new string[]
-        {
-            "#version 330 core\n",
-            "layout (location = 0) in vec3 position;\n",
-            "layout (location = 1) in vec4 color;\n",
-            "uniform mat4 perspective;\n",
-            "uniform mat4 view;\n",
-            "uniform mat4 model;\n",
-            "flat out vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_Position = perspective * view * model * vec4(position, 1.0);\n",
-                "inColor = color;\n",
-            "}\n",
-        };
-
-        public static string[] surfaceFragment = new string[]
-        {
-            "#version 330 core\n",
-            "flat in vec4 inColor;\n",
-            "void main()\n",
-            "{\n",
-                "gl_FragColor = inColor;\n",
-            "}\n"
-        };
     }
 }

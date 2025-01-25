@@ -1,31 +1,18 @@
 ﻿using CoreVisualizer.Interfaces;
 using GlmSharp;
-using SharpGL;
-using Assimp;
-using SharpGL.Enumerations;
-using SharpGL.SceneGraph.Lighting;
-using SharpGL.SceneGraph.Shaders;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Gl = SharpGL.OpenGL;
-using System.Resources;
-using System.Reflection;
+using OpenGL;
 using CoreVisualizer.Properties;
 
 namespace CoreVisualizer
 {
     public partial class RenderControl : UserControl , IRenderControl
     {
-        internal static OpenGL Gl { get; set; }
         private Dictionary<string, Model> Models { get; set; }
 
         private vec3 lastWorldPos;
@@ -73,8 +60,8 @@ namespace CoreVisualizer
         private void CreateShaderProgramFromResource(string key, string vertexSource, string fragmentSource)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromString(Gl.GL_VERTEX_SHADER, vertexSource);
-            program.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, fragmentSource);
+            program.CreateShaderFromString(ShaderType.VertexShader, vertexSource);
+            program.CreateShaderFromString(ShaderType.FragmentShader, fragmentSource);
             program.Link();
             RenderHandler.Programs.Add(key, program);
         }
@@ -82,8 +69,8 @@ namespace CoreVisualizer
         private void CreateShaderProgramFromArrays(string key, string[] vSource, string[] fSource)
         {
             var program = new ShaderProgramCreator();
-            program.CreateShaderFromStringArray(Gl.GL_VERTEX_SHADER, vSource);
-            program.CreateShaderFromStringArray(Gl.GL_FRAGMENT_SHADER, fSource);
+            program.CreateShaderFromStringArray(ShaderType.VertexShader, vSource);
+            program.CreateShaderFromStringArray(ShaderType.FragmentShader, fSource);
             program.Link();
             RenderHandler.Programs.Add(key, program);
         }
@@ -102,32 +89,31 @@ namespace CoreVisualizer
             sbFragment.Replace("#define USE_MATERIAL", "#define USE_TEXTURES");
 
             var tsProgram = new ShaderProgramCreator();
-            tsProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
-            tsProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
+            tsProgram.CreateShaderFromString(ShaderType.VertexShader, sbVertex.ToString());
+            tsProgram.CreateShaderFromString(ShaderType.FragmentShader, sbFragment.ToString());
             tsProgram.Link();
             RenderHandler.Programs.Add("MeshTangentSpace", tsProgram);
 
             sbVertex.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
             sbFragment.Replace("#define TANGENT_SPACE", "#define MODEL_SPACE");
             var msProgram = new ShaderProgramCreator();
-            msProgram.CreateShaderFromString(Gl.GL_VERTEX_SHADER, sbVertex.ToString());
-            msProgram.CreateShaderFromString(Gl.GL_FRAGMENT_SHADER, sbFragment.ToString());
+            msProgram.CreateShaderFromString(ShaderType.VertexShader, sbVertex.ToString());
+            msProgram.CreateShaderFromString(ShaderType.FragmentShader, sbFragment.ToString());
             msProgram.Link();
             RenderHandler.Programs.Add("MeshModelSpace", msProgram);
         }
 
         private void OnInit(object sender, EventArgs e)
         {
-            Gl = glControl.OpenGL;
             glControl.MouseWheel += OnMouseWheel;
-            glControl.OpenGLDraw += DrawScene;
+            glControl.Render += DrawScene;
 
             RenderHandler = new RenderHandler();
             //Programs = new Dictionary<string, ShaderProgramCreator>();
             Models = new Dictionary<string, Model>();
 
-            Gl.Enable(Gl.GL_DEPTH_TEST);
-            Gl.DepthFunc(Gl.GL_LEQUAL);
+            Gl.Enable(EnableCap.DepthTest);
+            Gl.DepthFunc(DepthFunction.Lequal);
 
             camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
@@ -153,11 +139,11 @@ namespace CoreVisualizer
                 program.Value.Dispose();
         }
 
-        private void DrawScene(object sender, RenderEventArgs args)
+        private void DrawScene(object sender, GlControlEventArgs args)
         {
             Gl.Viewport(0, 0, glControl.Width, glControl.Height);
             Gl.ClearColor(BackColor.R / 255f, BackColor.G / 255f, BackColor.B / 255f, BackColor.A / 255f);
-            Gl.Clear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
+            Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             foreach (var model in Models)
             {
                 model.Value.Draw(RenderHandler);
