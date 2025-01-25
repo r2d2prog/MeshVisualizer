@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Assimp;
-using SharpGL;
-using SharpGL.SceneGraph.Assets;
-using Gl = SharpGL.OpenGL;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public struct MeshTexture : IDisposable
     {
-        private static OpenGL Gl = RenderControl.Gl;
         private static bool FlipY = true;
         public uint Slot { get; private set; }
         public uint[] TextureId { get; set; }
@@ -41,7 +33,7 @@ namespace CoreVisualizer
         {
             if (TextureId != null)
             {
-                Gl.DeleteTextures(TextureId.Length, TextureId);
+                Gl.DeleteTextures(TextureId);
                 TextureId[0] = 0;
             }
         }
@@ -49,43 +41,39 @@ namespace CoreVisualizer
         private void CreateTexture(TextureSlot texture, string texturePath)
         {
             TextureId = new uint[1];
-            Gl.GenTextures(1, TextureId);
-            Gl.BindTexture(Gl.GL_TEXTURE_2D, TextureId[0]);
+            Gl.GenTextures(TextureId);
+            Gl.BindTexture(TextureTarget.Texture2d, TextureId[0]);
 
             var bitmap = new Bitmap(texturePath);
             if(FlipY)
                 bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
             var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, bitmap.PixelFormat);
-            //var length = bitmapData.Stride * bitmapData.Height;
-
-            //var data = new byte[length];
-            //Marshal.Copy(bitmapData.Scan0, data, 0, length);
             
-
             var formatData = DetectTextureFormat(bitmap.PixelFormat);
             var wrapU = DetectTextureWrapping(texture.WrapModeU);
             var wrapV = DetectTextureWrapping(texture.WrapModeV);
 
-            Gl.TexImage2D(Gl.GL_TEXTURE_2D, 0, formatData.Item1, bitmap.Width, bitmap.Height, 0, formatData.Item2, Gl.GL_UNSIGNED_BYTE, bitmapData.Scan0);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, wrapU);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, wrapV);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
-            Gl.TexParameter(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
-            Gl.BindTexture(Gl.GL_TEXTURE_2D, 0);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, formatData.Item1, bitmap.Width, bitmap.Height, 0, formatData.Item2, PixelType.UnsignedByte, bitmapData.Scan0);
+
+            Gl.TexParameterIi(TextureTarget.Texture2d, TextureParameterName.TextureWrapS, wrapU);
+            Gl.TexParameterIi(TextureTarget.Texture2d, TextureParameterName.TextureWrapT, wrapV);
+            Gl.TexParameterIi(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.LINEAR);
+            Gl.TexParameterIi(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.LINEAR);
+            Gl.BindTexture(TextureTarget.Texture2d, 0);
             bitmap.UnlockBits(bitmapData);
         }
 
-        private Tuple<uint,uint> DetectTextureFormat(PixelFormat format)
+        private Tuple<InternalFormat, OpenGL.PixelFormat> DetectTextureFormat(System.Drawing.Imaging.PixelFormat format)
         {
-            Tuple<uint,uint> result = new Tuple<uint, uint>(Gl.GL_RGBA, Gl.GL_RGB);
+            var result = Tuple.Create(OpenGL.InternalFormat.Rgba, OpenGL.PixelFormat.Rgb);
             switch (format)
             {
-                case PixelFormat.Format32bppRgb:
-                case PixelFormat.Format24bppRgb:
-                    result = new Tuple<uint, uint>(Gl.GL_RGB, Gl.GL_BGR);
+                case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
+                case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
+                    result = Tuple.Create(InternalFormat.Rgb, OpenGL.PixelFormat.Bgr);
                     break;
-                case PixelFormat.Format8bppIndexed:
-                    result = new Tuple<uint, uint>(Gl.GL_RED, Gl.GL_RED);
+                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
+                    result = Tuple.Create(InternalFormat.Red, OpenGL.PixelFormat.Red);
                     break;
                 default:
                     break;
@@ -93,16 +81,16 @@ namespace CoreVisualizer
             return result;
         }
 
-        private uint DetectTextureWrapping(TextureWrapMode mode)
+        private int DetectTextureWrapping(Assimp.TextureWrapMode mode)
         {
-            var result = Gl.GL_REPEAT;
+            var result = Gl.REPEAT;
             switch (mode)
             {
-                case TextureWrapMode.Clamp:
-                    result = Gl.GL_CLAMP_TO_EDGE;
+                case Assimp.TextureWrapMode.Clamp:
+                    result = Gl.CLAMP_TO_EDGE;
                     break;
-                case TextureWrapMode.Mirror:
-                    result = Gl.GL_MIRRORED_REPEAT;
+                case Assimp.TextureWrapMode.Mirror:
+                    result = Gl.MIRRORED_REPEAT;
                     break;
                 default:
                     break;

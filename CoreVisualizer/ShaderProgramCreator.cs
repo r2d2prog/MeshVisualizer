@@ -1,20 +1,14 @@
-﻿using CoreVisualizer.Properties;
-using SharpGL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Gl = SharpGL.OpenGL;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public class ShaderProgramCreator
     {
-        private static Gl Gl = RenderControl.Gl;
 
         public uint Vertex { get; set; }
 
@@ -30,10 +24,10 @@ namespace CoreVisualizer
 
         public void Unbind() => Gl.UseProgram(0);
 
-        public void BindTexture(string name, uint target, uint texId, uint texUnit)
+        public void BindTexture(string name, TextureTarget target, uint texId, uint texUnit)
         {
             var err = Gl.GetError();
-            Gl.ActiveTexture(Gl.GL_TEXTURE0 + texUnit);
+            Gl.ActiveTexture((TextureUnit)((int)TextureUnit.Texture0 + texUnit));
             Gl.BindTexture(target, texId);
             var id = Gl.GetUniformLocation(Program, name);
             Gl.Uniform1(id, (int)texUnit);
@@ -42,12 +36,12 @@ namespace CoreVisualizer
 
         public void SetCustomAttributes(uint buffer, string variable)
         {
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, buffer);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             var location = (uint)Gl.GetAttribLocation(Program, variable);
             Gl.BindAttribLocation(Program, location, variable);
             Gl.EnableVertexAttribArray(location);
-            Gl.VertexAttribPointer(location, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, 0);
+            Gl.VertexAttribPointer(location, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
         public void UnsetCustomAttributes(string variable)
@@ -71,12 +65,12 @@ namespace CoreVisualizer
             else if (count == 4)
                 Gl.Uniform4(id, values[0], values[1], values[2], values[3]);
             else if (count == 9)
-                Gl.UniformMatrix3(id, 1, false, values);
+                Gl.UniformMatrix3(id, false, values);
             else
-                Gl.UniformMatrix4(id, 1, false, values);//Передача матрицы в шейдер
+                Gl.UniformMatrix4(id, false, values);//Передача матрицы в шейдер
         }
 
-        public void CreateShaderFromFile(uint type, string path)
+        public void CreateShaderFromFile(ShaderType type, string path)
         {
             var data = new List<string>();
             using (var reader = new StreamReader(path))
@@ -86,7 +80,7 @@ namespace CoreVisualizer
             CreateShaderFromStringArray(type, data.ToArray());
         }
 
-        public void CreateShaderFromStringArray(uint type, string[] data)
+        public void CreateShaderFromStringArray(ShaderType type, string[] data)
         {
             var source = string.Join("", data);
             CreateShaderFromString(type, source);
@@ -94,28 +88,29 @@ namespace CoreVisualizer
 
 
 
-        public void CreateShaderFromString(uint type, string source)
+        public void CreateShaderFromString(ShaderType type, string source)
         {
             var shader = Gl.CreateShader(type);
-            Gl.ShaderSource(shader, source);
+            Gl.ShaderSource(shader, new string[] { source });
             try
             {
                 Gl.CompileShader(shader);
                 var status = new int[1];
-                Gl.GetShader(shader, Gl.GL_COMPILE_STATUS, status);
-                if (status[0] == Gl.GL_FALSE)
+                Gl.GetShader(shader, ShaderParameterName.CompileStatus, status);
+                if (status[0] == Gl.FALSE)
                     throw new Exception();
-                if (type == Gl.GL_VERTEX_SHADER)
+                if (type == ShaderType.VertexShader)
                     Vertex = shader;
-                else if (type == Gl.GL_FRAGMENT_SHADER)
+                else if (type == ShaderType.FragmentShader)
                     Fragment = shader;
-                else if (type == Gl.GL_GEOMETRY_SHADER)
+                else if (type == ShaderType.GeometryShader)
                     Geometry = shader;
             }
             catch
             {
                 var sb = new StringBuilder(1024);
-                Gl.GetShaderInfoLog(shader, 1024, IntPtr.Zero, sb);
+                var length = 0;
+                Gl.GetShaderInfoLog(shader, 1024, out length, sb);
                 if (MessageBox.Show(sb.ToString(), "Compile shader exception",
                                 MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Cancel)
                     Environment.Exit(1);
@@ -135,14 +130,15 @@ namespace CoreVisualizer
             {
                 Gl.LinkProgram(Program);
                 var status = new int[1];
-                Gl.GetProgram(Program, Gl.GL_LINK_STATUS, status);
-                if (status[0] == Gl.GL_FALSE)
+                Gl.GetProgram(Program, ProgramProperty.LinkStatus, status);
+                if (status[0] == Gl.FALSE)
                     throw new Exception();
             }
             catch
             {
                 var sb = new StringBuilder(1024);
-                Gl.GetProgramInfoLog(Program, 1024, IntPtr.Zero, sb);
+                var length = 0;
+                Gl.GetProgramInfoLog(Program, 1024, out length, sb);
                 if (MessageBox.Show(sb.ToString(), "Link program exception",
                                 MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Cancel)
                     Environment.Exit(1);

@@ -1,19 +1,15 @@
 ﻿using GlmSharp;
-using SharpGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Gl = SharpGL.OpenGL;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public class Arrows : IVaoSurface
     {
-        private static OpenGL Gl = RenderControl.Gl;
         public uint[] EBO { get; set; }
         public uint[] VAO { get; set; }
         public uint[] VertexBuffer { get; set; }
@@ -70,12 +66,12 @@ namespace CoreVisualizer
         public void Dispose()
         {
             if(ColorBuffer != null)
-                Gl.DeleteBuffers(1, ColorBuffer);
+                Gl.DeleteBuffers(ColorBuffer);
             if (MatrixBuffer != null)
-                Gl.DeleteBuffers(1, MatrixBuffer);
-            Gl.DeleteBuffers(1, VertexBuffer);
-            Gl.DeleteBuffers(1, EBO);
-            Gl.DeleteVertexArrays(1, VAO);
+                Gl.DeleteBuffers(MatrixBuffer);
+            Gl.DeleteBuffers(VertexBuffer);
+            Gl.DeleteBuffers(EBO);
+            Gl.DeleteVertexArrays(VAO);
         }
 
         public void Draw(ShaderProgramCreator program)
@@ -83,7 +79,7 @@ namespace CoreVisualizer
             if (VAO == null || VAO[0] == 0)
                 return;
             var vp = new int[4];
-            Gl.GetInteger(Gl.GL_VIEWPORT, vp);
+            Gl.Get(GetPName.Viewport, vp);
             var koef = (float)vp[2] / vp[3];
             var oldProj = Camera.Projection;
             var oldView = Camera.View;
@@ -98,8 +94,8 @@ namespace CoreVisualizer
             program.SetUniform("projection", Camera.Projection.ToArray());
             program.SetUniform("view", Camera.View.ToArray());
 
-            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
-            Gl.DrawElementsInstanced(Gl.GL_TRIANGLES, Indices[0], Gl.GL_UNSIGNED_INT, IntPtr.Zero, ModelMatrix.Length);
+            Gl.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            Gl.DrawElementsInstanced(PrimitiveType.Triangles, Indices[0], DrawElementsType.UnsignedInt, IntPtr.Zero, ModelMatrix.Length);
 
             Camera.View = oldView;
             Camera.Projection = oldProj;
@@ -113,40 +109,40 @@ namespace CoreVisualizer
             EBO = new uint[1];
             VertexBuffer = new uint[1];
             
-            Gl.GenVertexArrays(1, VAO);
-            Gl.GenBuffers(1, EBO);
-            Gl.GenBuffers(1, VertexBuffer);
+            Gl.GenVertexArrays(VAO);
+            Gl.GenBuffers(EBO);
+            Gl.GenBuffers(VertexBuffer);
 
             Gl.BindVertexArray(VAO[0]);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, EBO[0]);
 
             var indArray = indices.ToArray();
             IntPtr intPtr = Marshal.AllocHGlobal(indArray.Length * sizeof(int));
             Marshal.Copy(indArray, 0, intPtr, indArray.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indArray.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            Gl.BufferData(BufferTarget.ElementArrayBuffer, (uint)indArray.Length * sizeof(int), intPtr, BufferUsage.StaticDraw);
             Marshal.FreeHGlobal(intPtr);
 
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords.ToArray(), Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, VertexBuffer[0]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)coords.Length * sizeof(float), coords.ToArray(), BufferUsage.StaticDraw);
             
             Gl.EnableVertexAttribArray(0);
-            Gl.VertexAttribPointer(0, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
             if (colors != null)
             {
                 ColorBuffer = new uint[1];
-                Gl.GenBuffers(1, ColorBuffer);
+                Gl.GenBuffers(ColorBuffer);
                 
-                Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, ColorBuffer[0]);
-                Gl.BufferData(Gl.GL_ARRAY_BUFFER, colors.ToArray(), Gl.GL_STATIC_DRAW);
+                Gl.BindBuffer(BufferTarget.ArrayBuffer, ColorBuffer[0]);
+                Gl.BufferData(BufferTarget.ArrayBuffer, (uint)colors.Length * sizeof(float), colors.ToArray(), BufferUsage.StaticDraw);
 
                 Gl.EnableVertexAttribArray(1);
-                Gl.VertexAttribPointer(1, 4, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+                Gl.VertexAttribPointer(1, 4, VertexAttribType.Float, false, 0, IntPtr.Zero);
             }
 
             MatrixBuffer = new uint[1];
-            Gl.GenBuffers(1, MatrixBuffer);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, MatrixBuffer[0]);
+            Gl.GenBuffers(MatrixBuffer);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, MatrixBuffer[0]);
             var matrixSize = Marshal.SizeOf(typeof(mat4));
             var vec4Size = Marshal.SizeOf(typeof(vec4));
             var size = matrixSize * ModelMatrix.Length;
@@ -154,25 +150,25 @@ namespace CoreVisualizer
             var modelMatrices = ModelMatrix.SelectMany(v => v.ToArray()).ToArray();
             IntPtr modelPtr = Marshal.AllocHGlobal(size);
             Marshal.Copy(modelMatrices, 0, modelPtr, modelMatrices.Length);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, size, modelPtr, Gl.GL_STATIC_DRAW);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)size, modelPtr, BufferUsage.StaticDraw);
             Marshal.FreeHGlobal(modelPtr);
 
             Gl.EnableVertexAttribArray(1);
-            Gl.VertexAttribPointer(1, 4, Gl.GL_FLOAT, false, matrixSize, IntPtr.Zero);
+            Gl.VertexAttribPointer(1, 4, VertexAttribType.Float, false, matrixSize, IntPtr.Zero);
             Gl.EnableVertexAttribArray(2);
-            Gl.VertexAttribPointer(2, 4, Gl.GL_FLOAT, false, matrixSize, (IntPtr)(vec4Size * 1));
+            Gl.VertexAttribPointer(2, 4, VertexAttribType.Float, false, matrixSize, (IntPtr)(vec4Size * 1));
             Gl.EnableVertexAttribArray(3);
-            Gl.VertexAttribPointer(3, 4, Gl.GL_FLOAT, false, matrixSize, (IntPtr)(vec4Size * 2));
+            Gl.VertexAttribPointer(3, 4, VertexAttribType.Float, false, matrixSize, (IntPtr)(vec4Size * 2));
             Gl.EnableVertexAttribArray(4);
-            Gl.VertexAttribPointer(4, 4, Gl.GL_FLOAT, false, matrixSize, (IntPtr)(vec4Size * 3));
+            Gl.VertexAttribPointer(4, 4, VertexAttribType.Float, false, matrixSize, (IntPtr)(vec4Size * 3));
             Gl.VertexAttribDivisor(1, 1);
             Gl.VertexAttribDivisor(2, 1);
             Gl.VertexAttribDivisor(3, 1);
             Gl.VertexAttribDivisor(4, 1);
 
             Gl.BindVertexArray(0);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, 0);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, 0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
     }
 }

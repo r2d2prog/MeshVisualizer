@@ -1,23 +1,13 @@
-﻿using SharpGL;
-using SharpGL.SceneGraph.Shaders;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gl = SharpGL.OpenGL;
-using GlmSharp;
-using SharpGL.SceneGraph;
-using static System.Windows.Forms.LinkLabel;
-using System.Windows.Forms;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public class Grid : IDisposable
     {
-        private static OpenGL Gl = RenderControl.Gl;
-
         private static Color ThinColor { get; set; } = Color.DarkSlateGray;
         private static Color ThickColor { get; set; } = Color.LightSlateGray;
 
@@ -59,7 +49,7 @@ namespace CoreVisualizer
         {
             if (Show)
             {
-                Gl.Enable(Gl.GL_LINE_SMOOTH);
+                Gl.Enable(EnableCap.LineSmooth);
                 Gl.UseProgram(program.Program);
                 Gl.BindVertexArray(VAO[0]);
 
@@ -67,14 +57,14 @@ namespace CoreVisualizer
                 program.SetUniform("view", Camera.View.ToArray());
 
                 Gl.LineWidth(ThinThickness);
-                Gl.DrawArrays(Gl.GL_LINES, ThinStart, ThinCount);
+                Gl.DrawArrays(PrimitiveType.Lines, ThinStart, ThinCount);
 
                 Gl.LineWidth(ThickThickness);
                 var count = ShowWorldAxis ? ThickCount + OrtsCount : ThickCount;
-                Gl.DrawArrays(Gl.GL_LINES, ThickStart, count);
+                Gl.DrawArrays(PrimitiveType.Lines, ThickStart, count);
 
                 Gl.LineWidth(1.0f);
-                Gl.Disable(Gl.GL_LINE_SMOOTH);
+                Gl.Disable(EnableCap.LineSmooth);
                 Gl.BindVertexArray(0);
                 Gl.UseProgram(0);
             }
@@ -82,9 +72,9 @@ namespace CoreVisualizer
 
         public void Dispose()
         {
-            Gl.DeleteBuffers(1, ColorBuffer);
-            Gl.DeleteBuffers(1, VertexBuffer);
-            Gl.DeleteVertexArrays(1, VAO);
+            Gl.DeleteBuffers(ColorBuffer);
+            Gl.DeleteBuffers(VertexBuffer);
+            Gl.DeleteVertexArrays(VAO);
         }
 
         private void CreateLines(float modelSize, uint gridSize)
@@ -192,22 +182,22 @@ namespace CoreVisualizer
             VertexBuffer = new uint[1];
             ColorBuffer = new uint[1];
 
-            Gl.GenVertexArrays(1, VAO);
-            Gl.GenBuffers(1, VertexBuffer);
-            Gl.GenBuffers(1, ColorBuffer);
+            Gl.GenVertexArrays(VAO);
+            Gl.GenBuffers(VertexBuffer);
+            Gl.GenBuffers(ColorBuffer);
 
             Gl.BindVertexArray(VAO[0]);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[0]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords, Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, VertexBuffer[0]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)coords.Length * sizeof(float) ,coords, BufferUsage.StaticDraw);
 
             Gl.EnableVertexAttribArray(0);
-            Gl.VertexAttribPointer(0, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, ColorBuffer[0]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, colors, Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, ColorBuffer[0]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)colors.Length * sizeof(float), colors, BufferUsage.StaticDraw);
 
             Gl.EnableVertexAttribArray(1);
-            Gl.VertexAttribPointer(1, 4, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(1, 4, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
             Gl.BindVertexArray(0);
         }

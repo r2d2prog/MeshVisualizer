@@ -2,26 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Assimp;
 using System.Runtime.InteropServices;
-using SharpGL;
-using Gl = SharpGL.OpenGL;
 using System.Drawing;
 using System.IO;
-using Assimp.Configs;
-using System.Drawing.Imaging;
-using System.Reflection;
-using SharpGL.SceneGraph;
-using System.Windows.Forms;
+using OpenGL;
 
 namespace CoreVisualizer
 {
     public class Model : IVaoSurface
     {
         private const int textureSlots = 7;
-        private static OpenGL Gl = RenderControl.Gl;
         public uint[] EBO { get ; set ; }
         public uint[] VAO { get; set; }
         public uint[] VertexBuffer { get; set; }
@@ -64,13 +55,13 @@ namespace CoreVisualizer
             BoundingBoxes = new BoundingBox[scene.MeshCount];
             
 
-            Gl.GenVertexArrays(scene.MeshCount, VAO);
-            Gl.GenBuffers(scene.MeshCount, EBO);
-            Gl.GenBuffers(scene.MeshCount, VertexBuffer);
-            Gl.GenBuffers(scene.MeshCount, ColorBuffer);
-            Gl.GenBuffers(scene.MeshCount, UvBuffer);
-            Gl.GenBuffers(scene.MeshCount, NormalBuffer);
-            Gl.GenBuffers(scene.MeshCount, TangentBuffer);
+            Gl.GenVertexArrays(VAO);
+            Gl.GenBuffers(EBO);
+            Gl.GenBuffers(VertexBuffer);
+            Gl.GenBuffers(ColorBuffer);
+            Gl.GenBuffers(UvBuffer);
+            Gl.GenBuffers(NormalBuffer);
+            Gl.GenBuffers(TangentBuffer);
 
             for (var i = 0; i < scene.MeshCount; ++i)
             {
@@ -109,68 +100,68 @@ namespace CoreVisualizer
                                       float[] normals, float[] tangents, int index = 0)
         {
             Gl.BindVertexArray(VAO[index]);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, EBO[index]);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, EBO[index]);
 
             IntPtr intPtr = Marshal.AllocHGlobal(indices.Length * sizeof(int));
             Marshal.Copy(indices, 0, intPtr, indices.Length);
-            Gl.BufferData(Gl.GL_ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(int), intPtr, Gl.GL_STATIC_DRAW);
+            Gl.BufferData(BufferTarget.ElementArrayBuffer, (uint)indices.Length * sizeof(int), intPtr, BufferUsage.StaticDraw);
             Marshal.FreeHGlobal(intPtr);
 
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, VertexBuffer[index]);
-            Gl.BufferData(Gl.GL_ARRAY_BUFFER, coords, Gl.GL_STATIC_DRAW);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, VertexBuffer[index]);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)coords.Length * sizeof(float), coords, BufferUsage.StaticDraw);
 
             Gl.EnableVertexAttribArray(0);
-            Gl.VertexAttribPointer(0, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
 
             if (colors != null)
             {
-                Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, ColorBuffer[index]);
-                Gl.BufferData(Gl.GL_ARRAY_BUFFER, colors, Gl.GL_STATIC_DRAW);
+                Gl.BindBuffer(BufferTarget.ArrayBuffer, ColorBuffer[index]);
+                Gl.BufferData(BufferTarget.ArrayBuffer, (uint)colors.Length * sizeof(float), colors, BufferUsage.StaticDraw);
 
                 Gl.EnableVertexAttribArray(1);
-                Gl.VertexAttribPointer(1, 4, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+                Gl.VertexAttribPointer(1, 4, VertexAttribType.Float, false, 0, IntPtr.Zero);
             }
 
             if (uvs != null)
             {
-                Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, UvBuffer[index]);
-                Gl.BufferData(Gl.GL_ARRAY_BUFFER, uvs, Gl.GL_STATIC_DRAW);
+                Gl.BindBuffer(BufferTarget.ArrayBuffer, UvBuffer[index]);
+                Gl.BufferData(BufferTarget.ArrayBuffer, (uint)uvs.Length * sizeof(float), uvs, BufferUsage.StaticDraw);
 
                 Gl.EnableVertexAttribArray(2);
-                Gl.VertexAttribPointer(2, 2, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+                Gl.VertexAttribPointer(2, 2, VertexAttribType.Float, false, 0, IntPtr.Zero);
             }
 
             if (normals != null)
             {
-                Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, NormalBuffer[index]);
-                Gl.BufferData(Gl.GL_ARRAY_BUFFER, normals, Gl.GL_STATIC_DRAW);
+                Gl.BindBuffer(BufferTarget.ArrayBuffer, NormalBuffer[index]);
+                Gl.BufferData(BufferTarget.ArrayBuffer, (uint)normals.Length * sizeof(float), normals, BufferUsage.StaticDraw);
 
                 Gl.EnableVertexAttribArray(3);
-                Gl.VertexAttribPointer(3, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+                Gl.VertexAttribPointer(3, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             }
 
             if (tangents != null)
             {
-                Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, TangentBuffer[index]);
-                Gl.BufferData(Gl.GL_ARRAY_BUFFER, tangents, Gl.GL_STATIC_DRAW);
+                Gl.BindBuffer(BufferTarget.ArrayBuffer, TangentBuffer[index]);
+                Gl.BufferData(BufferTarget.ArrayBuffer, (uint)normals.Length * sizeof(float), tangents, BufferUsage.StaticDraw);
 
                 Gl.EnableVertexAttribArray(4);
-                Gl.VertexAttribPointer(4, 3, Gl.GL_FLOAT, false, 0, IntPtr.Zero);
+                Gl.VertexAttribPointer(4, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             }
 
             Gl.BindVertexArray(0);
-            Gl.BindBuffer(Gl.GL_ARRAY_BUFFER, 0);
-            Gl.BindBuffer(Gl.GL_ELEMENT_ARRAY_BUFFER, 0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
         }
 
         public void Dispose()
         {
-            Gl.DeleteBuffers(ColorBuffer.Length, ColorBuffer);
-            Gl.DeleteBuffers(VertexBuffer.Length, VertexBuffer);
-            Gl.DeleteBuffers(UvBuffer.Length, UvBuffer);
-            Gl.DeleteBuffers(NormalBuffer.Length, NormalBuffer);
-            Gl.DeleteBuffers(EBO.Length, EBO);
-            Gl.DeleteVertexArrays(VAO.Length, VAO);
+            Gl.DeleteBuffers(ColorBuffer);
+            Gl.DeleteBuffers(VertexBuffer);
+            Gl.DeleteBuffers(UvBuffer);
+            Gl.DeleteBuffers(NormalBuffer);
+            Gl.DeleteBuffers(EBO);
+            Gl.DeleteVertexArrays(VAO);
             for (var i = 0; i < VAO.Length; ++i)
             {
                 if (Textures[i] != null)
@@ -231,17 +222,17 @@ namespace CoreVisualizer
                     {
                         var texture = Textures[index][j];
                         if (texture.TextureId != null)
-                            program.BindTexture(texture.UniformName, Gl.GL_TEXTURE_2D, texture.TextureId[0], texture.Slot);
+                            program.BindTexture(texture.UniformName, TextureTarget.Texture2d, texture.TextureId[0], texture.Slot);
                     }
                 }
-                Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
-                Gl.DrawElements(Gl.GL_TRIANGLES, Indices[index], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+                Gl.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                Gl.DrawElements(OpenGL.PrimitiveType.Triangles, Indices[index], DrawElementsType.UnsignedInt, IntPtr.Zero);
             }
             if ((RasterizationModes[index] & RasterizationMode.Wireframe) != RasterizationMode.None)
-                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], Gl.GL_LINE, index, LineColor);
+                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], PolygonMode.Line, index, LineColor);
 
             if ((RasterizationModes[index] & RasterizationMode.Points) != RasterizationMode.None)
-                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], Gl.GL_POINT, index, PointColor);
+                DrawInWireframeOrPointMode(handler.Programs["PrimitiveRasterization"], PolygonMode.Point, index, PointColor);
             Materials[index] = oldMaterial;
         }
 
@@ -252,15 +243,15 @@ namespace CoreVisualizer
             Materials[index].SetColor(Materials[index].Diffuse, color);
         }
 
-        private void DrawInWireframeOrPointMode(ShaderProgramCreator program, uint rasterMode, int index, Color4D color)
+        private void DrawInWireframeOrPointMode(ShaderProgramCreator program, PolygonMode rasterMode, int index, Color4D color)
         {
             Gl.UseProgram(program.Program);
             Gl.PointSize(2.5f);
             PassMatrices(program, index);
             SetDiffuseMaterial(index, color);
             program.SetUniform("color", Materials[index].Diffuse);
-            Gl.PolygonMode(Gl.GL_FRONT_AND_BACK, rasterMode);
-            Gl.DrawElements(Gl.GL_TRIANGLES, Indices[index], Gl.GL_UNSIGNED_INT, IntPtr.Zero);
+            Gl.PolygonMode(MaterialFace.FrontAndBack, rasterMode);
+            Gl.DrawElements(OpenGL.PrimitiveType.Triangles, Indices[index], DrawElementsType.UnsignedInt, IntPtr.Zero);
             Gl.PointSize(1.0f);
         }
 
@@ -320,7 +311,7 @@ namespace CoreVisualizer
         private TextureSlot CreateDiffuseSlot(string path)
         {
             var slot = new TextureSlot(path, TextureType.Diffuse, 0, TextureMapping.FromUV, 0, 0,
-                                       TextureOperation.Multiply, TextureWrapMode.Wrap, TextureWrapMode.Wrap, 0);
+                                       TextureOperation.Multiply, Assimp.TextureWrapMode.Wrap, Assimp.TextureWrapMode.Wrap, 0);
             return slot;
         }
 
@@ -369,32 +360,4 @@ namespace CoreVisualizer
             return colors;
         }
     }
-
-
-    public class NoDiffuse
-    {
-        public static string vertexNoDiffuse =
-            "#version 330 core\n" +
-            "layout (location = 0) in vec3 position;\n" +
-            "layout (location = 1) in vec3 color;\n" +
-            "layout (location = 2) in vec3 uvs;\n" +
-            "layout (location = 3) in vec3 normal;\n" +
-            "layout (location = 4) in vec3 tangent;\n" +
-            "uniform mat4 view;\n" +
-            "uniform mat4 model;\n" +
-            "uniform mat4 projection;\n" +
-            "void main()\n" +
-            "{\n" +
-            "   gl_Position = projection * view * model * vec4(position, 1.0);\n" +
-            "}";
-
-        public static string fragmentNoDiffuse =
-            "#version 330 core\n" +
-            "uniform vec4 color;\n" +
-            "void main()\n" +
-            "{\n" +
-            "   gl_FragColor = color;\n" +
-            "}";
-        
-    } 
 }
