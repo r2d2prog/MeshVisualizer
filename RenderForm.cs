@@ -93,5 +93,13 @@ namespace MeshVisualizer
             SetLightDirection(directionalLight.LightDirection3D);
             renderControl.DoRender();
         }
+
+        private void OnEnableAntialiasing(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            control.Checked = !control.Checked;
+            renderControl.SetAntialiasing(control.Checked);
+            renderControl.DoRender();
+        }
     }
 }
