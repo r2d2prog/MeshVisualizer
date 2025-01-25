@@ -83,5 +83,15 @@ namespace MeshVisualizer
                 renderControl.DoRender();
             }
         }
+
+        private void OnAlignLighting(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            var plane = (ViewPlane)Enum.Parse(typeof(ViewPlane), control.Text);
+            directionalLight.AlignDirection(plane);
+            toolStripLabel1.Invalidate();
+            SetLightDirection(directionalLight.LightDirection3D);
+            renderControl.DoRender();
+        }
     }
 }

@@ -68,6 +68,43 @@ namespace MeshVisualizer
             return false;
         }
 
+        public void AlignDirection(ViewPlane direction)
+        {
+            switch (direction)
+            {
+                case ViewPlane.XY:
+                    LightDirection3D = vec3.UnitZ;
+                    lightDir2D = new vec3(23f, 46f, 0f);
+                    IsPositiveHemisphere = true;
+                    break;
+                case ViewPlane.YX:
+                    LightDirection3D = -vec3.UnitZ;
+                    lightDir2D = new vec3(23f, 0f, 0f);
+                    IsPositiveHemisphere = true;
+                    break;
+                case ViewPlane.ZX:
+                    LightDirection3D = vec3.UnitY;
+                    lightDir2D = new vec3(23f, 23f, 0f);
+                    IsPositiveHemisphere = true;
+                    break;
+                case ViewPlane.XZ:
+                    LightDirection3D = -vec3.UnitY;
+                    lightDir2D = new vec3(23f, 23f, 0f);
+                    IsPositiveHemisphere = false;
+                    break;
+                case ViewPlane.YZ:
+                    LightDirection3D = vec3.UnitX;
+                    lightDir2D = new vec3(46f, 23f, 0f);
+                    IsPositiveHemisphere = true;
+                    break;
+                default:
+                    LightDirection3D = -vec3.UnitX;
+                    lightDir2D = new vec3(0f, 23f, 0f);
+                    IsPositiveHemisphere = true;
+                    break;
+            }
+        }
+
         public void ChangeLightHemisphere()
         {
             IsPositiveHemisphere = !IsPositiveHemisphere;
