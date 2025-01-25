@@ -38,7 +38,7 @@
             this.glControl.DepthBits = ((uint)(16u));
             this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.glControl.Location = new System.Drawing.Point(0, 0);
-            this.glControl.MultisampleBits = ((uint)(0u));
+            this.glControl.MultisampleBits = ((uint)(4u));
             this.glControl.Name = "glControl";
             this.glControl.Size = new System.Drawing.Size(600, 400);
             this.glControl.StencilBits = ((uint)(8u));

@@ -57,6 +57,14 @@ namespace CoreVisualizer
             return null;
         }
 
+        public void SetAntialiasing(bool isEnable)
+        {
+            if(isEnable)
+                Gl.Enable(EnableCap.Multisample);
+            else
+                Gl.Disable(EnableCap.Multisample);
+        }
+
         private void CreateShaderProgramFromResource(string key, string vertexSource, string fragmentSource)
         {
             var program = new ShaderProgramCreator();
@@ -109,11 +117,11 @@ namespace CoreVisualizer
             glControl.Render += DrawScene;
 
             RenderHandler = new RenderHandler();
-            //Programs = new Dictionary<string, ShaderProgramCreator>();
             Models = new Dictionary<string, Model>();
 
             Gl.Enable(EnableCap.DepthTest);
             Gl.DepthFunc(DepthFunction.Lequal);
+            SetAntialiasing(true);
 
             camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
@@ -124,8 +132,6 @@ namespace CoreVisualizer
             CreateMeshMaterialProgram();
             CreateMeshTexturedProgram();
 
-            //lights = new DirectionalLight[2];
-            //lights[0] = new DirectionalLight(-vec3.UnitZ, new vec4(0.5f,0.5f,0.5f,1.0f));
             Disposed += OnDisposed;
         }
 
