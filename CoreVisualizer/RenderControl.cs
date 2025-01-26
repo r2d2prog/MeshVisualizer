@@ -80,6 +80,9 @@ namespace CoreVisualizer
                 Gl.Disable(EnableCap.Multisample);
         }
 
+        public void ShowGrid(bool isShow) => grid.Show = isShow;
+        
+        public void ShowWorldAxis(bool isShow) => grid.ShowWorldAxis = isShow;
         private void CreateShaderProgramFromResource(string key, string vertexSource, string fragmentSource)
         {
             var program = new ShaderProgramCreator();

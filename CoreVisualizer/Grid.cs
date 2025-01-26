@@ -47,27 +47,28 @@ namespace CoreVisualizer
 
         public void Draw(ShaderProgramCreator program)
         {
-            if (Show)
-            {
-                Gl.Enable(EnableCap.LineSmooth);
-                Gl.UseProgram(program.Program);
-                Gl.BindVertexArray(VAO[0]);
+            Gl.Enable(EnableCap.LineSmooth);
+            Gl.UseProgram(program.Program);
+            Gl.BindVertexArray(VAO[0]);
 
-                program.SetUniform("perspective", Camera.Projection.ToArray());
-                program.SetUniform("view", Camera.View.ToArray());
+            program.SetUniform("perspective", Camera.Projection.ToArray());
+            program.SetUniform("view", Camera.View.ToArray());
 
-                Gl.LineWidth(ThinThickness);
-                Gl.DrawArrays(PrimitiveType.Lines, ThinStart, ThinCount);
+            var thinCount = Show ? ThinCount : 0;
+            var thickCount = Show ? ThickCount : 0;
+            var thickStart = Show ? ThickStart : ThickStart + ThickCount;
 
-                Gl.LineWidth(ThickThickness);
-                var count = ShowWorldAxis ? ThickCount + OrtsCount : ThickCount;
-                Gl.DrawArrays(PrimitiveType.Lines, ThickStart, count);
+            Gl.LineWidth(ThinThickness);
+            Gl.DrawArrays(PrimitiveType.Lines, ThinStart, thinCount);
 
-                Gl.LineWidth(1.0f);
-                Gl.Disable(EnableCap.LineSmooth);
-                Gl.BindVertexArray(0);
-                Gl.UseProgram(0);
-            }
+            Gl.LineWidth(ThickThickness);
+            thickCount = ShowWorldAxis ? ThickStart + OrtsCount : thickCount;
+            Gl.DrawArrays(PrimitiveType.Lines, thickStart, thickCount);
+
+            Gl.LineWidth(1.0f);
+            Gl.Disable(EnableCap.LineSmooth);
+            Gl.BindVertexArray(0);
+            Gl.UseProgram(0);
         }
 
         public void Dispose()

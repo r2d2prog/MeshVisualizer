@@ -98,5 +98,20 @@ namespace MeshVisualizer
             renderControl.SetAntialiasing(control.Checked);
             renderControl.DoRender();
         }
+
+        private void OnShowGrid(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            control.Checked = !control.Checked;
+            renderControl.ShowGrid(control.Checked);
+            renderControl.DoRender();
+        }
+        private void OnShowWorldAxis(object sender, EventArgs e)
+        {
+            var control = sender as ToolStripMenuItem;
+            control.Checked = !control.Checked;
+            renderControl.ShowWorldAxis(control.Checked);
+            renderControl.DoRender();
+        }
     }
 }
