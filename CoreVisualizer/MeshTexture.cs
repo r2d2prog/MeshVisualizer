@@ -76,6 +76,7 @@ namespace CoreVisualizer
                     result = Tuple.Create(InternalFormat.Red, OpenGL.PixelFormat.Red);
                     break;
                 default:
+                    result = Tuple.Create(InternalFormat.Rgba, OpenGL.PixelFormat.Bgra);
                     break;
             }
             return result;
