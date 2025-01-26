@@ -24,6 +24,8 @@ namespace CoreVisualizer
         public Model ActiveModel {  get; set; }
         public RenderHandler RenderHandler { get; private set; }
 
+        public RasterizationMode RasterizationMode { get; set; } = RasterizationMode.Shaded;
+
         public RenderControl()
         {
             InitializeComponent();
@@ -40,12 +42,25 @@ namespace CoreVisualizer
             DoRender();
         }
 
+        public void SetRasterizationMode(RasterizationMode mode, bool checkState)
+        {
+            if (checkState)
+                RasterizationMode |= mode;
+            else
+                RasterizationMode &= ~mode;
+            if(ActiveModel != null)
+                for (var i = 0; i < ActiveModel.VAO.Length; ++i)
+                    ActiveModel.RasterizationModes[i] = RasterizationMode;
+        }
+
         public void LoadModel(string path)
         {
             var model = new Model(path);
             var modelName = Path.GetFileNameWithoutExtension(path);
             Models.Add(modelName, model);
             ActiveModel = model;
+            for (var i = 0; i < ActiveModel.VAO.Length; ++i)
+                ActiveModel.RasterizationModes[i] = RasterizationMode;
         }
 
         public IEnumerable<string> GetModelNames() => Models.Keys;

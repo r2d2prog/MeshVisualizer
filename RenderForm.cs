@@ -38,15 +38,12 @@ namespace MeshVisualizer
         private void OnRasterModeChange(object sender, EventArgs e)
         {
             var control = sender as ToolStripMenuItem;
-            var checkState = control.Checked;
-            control.Checked = !checkState;
-            if(renderControl.ActiveModel != null)
-            {
-                var id = int.Parse(control.Tag.ToString());
-                var mode = (RasterizationMode)id;
-                renderControl.ActiveModel.SetRasterizationMode(mode, control.Checked);
+            control.Checked = !control.Checked;
+            var id = int.Parse(control.Tag.ToString());
+            var mode = (RasterizationMode)id;
+            renderControl.SetRasterizationMode(mode, control.Checked);
+            if (renderControl.ActiveModel != null)
                 renderControl.DoRender();
-            }
         }
 
         private void OnRedrawLightDirection(object sender, PaintEventArgs e)

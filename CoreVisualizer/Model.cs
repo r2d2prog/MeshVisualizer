@@ -85,7 +85,6 @@ namespace CoreVisualizer
                 if(mesh.HasTangentBasis)
                     tangents = mesh.Tangents.SelectMany(v => new float[] { v.X, v.Y, v.Z }).ToArray();
                 CreateTextures(material, i, path);
-                RasterizationModes[i] = RasterizationMode.Shaded;
                 float[] colors = null;
                 CreateVertexArray(indices, coords, colors, uvs, normals, tangents, i);
             }
@@ -180,16 +179,6 @@ namespace CoreVisualizer
                         Draw(handler, i);
                 }
             }
-        }
-
-        public void SetRasterizationMode(RasterizationMode mode, bool checkState)
-        {
-            if (checkState)
-                for (var i = 0; i < RasterizationModes.Length; ++i)
-                    RasterizationModes[i] |= mode;
-            else
-                for (var i = 0; i < RasterizationModes.Length; ++i)
-                    RasterizationModes[i] &= ~mode;
         }
 
         private void Draw(RenderHandler handler, int index)
