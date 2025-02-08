@@ -113,5 +113,11 @@ namespace MeshVisualizer
             renderControl.ShowWorldAxis(control.Checked);
             renderControl.DoRender();
         }
+
+        private void OnFitOnScreen(object sender, EventArgs e)
+        {
+            renderControl.FitOnScreen();
+            renderControl.DoRender();
+        }
     }
 }

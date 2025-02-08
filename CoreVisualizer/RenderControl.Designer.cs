@@ -44,9 +44,11 @@
             this.glControl.StencilBits = ((uint)(8u));
             this.glControl.TabIndex = 0;
             this.glControl.Load += new System.EventHandler(this.OnInit);
+            this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown);
             this.glControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnMouseDown);
             this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove);
             this.glControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OnMouseUp);
+            this.glControl.Resize += new System.EventHandler(this.OnResize);
             // 
             // RenderControl
             // 

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using OpenGL;
 using CoreVisualizer.Properties;
+using System.Linq;
 
 namespace CoreVisualizer
 {
@@ -80,6 +81,12 @@ namespace CoreVisualizer
                 Gl.Disable(EnableCap.Multisample);
         }
 
+        public void FitOnScreen()
+        {
+            if (ActiveModel != null)
+                camera.FitOnScreen(ActiveModel);
+        }
+
         public void ShowGrid(bool isShow) => grid.Show = isShow;
         
         public void ShowWorldAxis(bool isShow) => grid.ShowWorldAxis = isShow;
@@ -141,7 +148,7 @@ namespace CoreVisualizer
             Gl.DepthFunc(DepthFunction.Lequal);
             SetAntialiasing(true);
 
-            camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f), new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
+            camera = new Camera(new vec3(0.57735f, 0.57735f, 0.57735f) /*vec3.UnitZ*/, new vec3(0.0f, 0.0f, 0.0f), (float)glControl.Width / glControl.Height);
             grid = new Grid(Camera.AspectRatio);
 
             CreateShaderProgramFromResource("Grid", Resources.grid_vs, Resources.grid_fs);
@@ -199,6 +206,8 @@ namespace CoreVisualizer
             }
         }
 
+        private void Pan(float dX, float dY) => camera.Translate(dX, dY, 0);
+
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
             var newMouseCoords = new Point(e.X - (glControl.Width / 2), -e.Y + glControl.Height / 2);
@@ -213,7 +222,7 @@ namespace CoreVisualizer
             {
                 var dX = (lastMousePos.X - e.X) / (float)glControl.Width * Camera.MouseSensX;
                 var dY = (e.Y - lastMousePos.Y) / (float)glControl.Height * Camera.MouseSensY;
-                camera.Translate(dX, dY, 0);
+                Pan(dX, dY);
                 DoRender();
             }
             lastMousePos = e.Location;
@@ -224,6 +233,15 @@ namespace CoreVisualizer
             var deltaZ = e.Delta / 1000f * Camera.MouseWheelSens;
             camera.Translate(0, 0, -deltaZ);
             DoRender();
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F)
+            {
+                FitOnScreen();
+                DoRender();
+            }
         }
     }
 }
