@@ -1,6 +1,7 @@
 ﻿using Assimp;
 using GlmSharp;
 using System;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace CoreVisualizer
@@ -45,11 +46,13 @@ namespace CoreVisualizer
             }
         }
 
-        public void AlignToModelCenter(Model model)
+        public void AlignToModelCenter(BoundingBox combinedBb)
         {
             var viewPos = View.Column3;
             var lastWorldPos = GetWorldPosition();
-            var center = View * model.ModelMatrix[0] * new vec4(model.BoundingBoxes[0].Center);
+ 
+            var center = View * new vec4(combinedBb.Center);
+
             var tVec = -center - viewPos;
             var translate = mat4.Translate(tVec.x, tVec.y, 0);
             View = translate * View;
@@ -60,19 +63,18 @@ namespace CoreVisualizer
 
         public void FitOnScreen(Model activeModel)
         {
-            AlignToModelCenter(activeModel);
-
             var bb = BoundingBox.Combine(activeModel);
+            AlignToModelCenter(bb);
 
             var corners = new vec4[] { new vec4(bb.LeftUpNear, 1),
-                                           new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.LeftUpNear.z,1),
-                                           new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
-                                           new vec4(bb.LeftUpNear.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
+                                       new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.LeftUpNear.z,1),
+                                       new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
+                                       new vec4(bb.LeftUpNear.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
 
-                                           new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
-                                           new vec4(bb.RightDownFar.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
-                                           new vec4(bb.RightDownFar,1),
-                                           new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.RightDownFar.z,1)};
+                                       new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
+                                       new vec4(bb.RightDownFar.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
+                                       new vec4(bb.RightDownFar,1),
+                                       new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.RightDownFar.z,1)};
 
             var minX = float.MaxValue;
             var minY = float.MaxValue;
@@ -82,7 +84,7 @@ namespace CoreVisualizer
 
             for (var i = 0; i < corners.Length; ++i)
             {
-                corners[i] = Camera.View * corners[i];
+                corners[i] = View * corners[i];
                 minX = Math.Min(minX, corners[i].x);
                 maxX = Math.Max(maxX, corners[i].x);
 
@@ -100,7 +102,7 @@ namespace CoreVisualizer
             if (width > height)
             {
                 var viewHalfHeight = 0.1f * (float)Math.Sqrt(3) / 3;
-                var viewHalfWidth = Camera.AspectRatio * viewHalfHeight;
+                var viewHalfWidth = AspectRatio * viewHalfHeight;
                 var mHalfWidth = viewHalfWidth * md / 0.1f;
                 delta = maxZ + mHalfWidth;
             }
