@@ -46,67 +46,25 @@ namespace CoreVisualizer
             }
         }
 
-        public void AlignToModelCenter(BoundingBox combinedBb)
-        {
-            var viewPos = View.Column3;
-            var lastWorldPos = GetWorldPosition();
- 
-            var center = View * new vec4(combinedBb.Center);
-
-            var tVec = -center - viewPos;
-            var translate = mat4.Translate(tVec.x, tVec.y, 0);
-            View = translate * View;
-
-            var dir = Target - lastWorldPos;
-            Target = GetWorldPosition() + dir;
-        }
-
         public void FitOnScreen(Model activeModel)
         {
             var bb = BoundingBox.Combine(activeModel);
-            AlignToModelCenter(bb);
 
-            var corners = new vec4[] { new vec4(bb.LeftUpNear, 1),
-                                       new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.LeftUpNear.z,1),
-                                       new vec4(bb.RightDownFar.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
-                                       new vec4(bb.LeftUpNear.x, bb.LeftUpNear.y, bb.RightDownFar.z,1),
+            var center = View * new vec4(bb.Center);
+            var tVec = -center - View.Column3;
+            var translate = mat4.Translate(tVec.x, tVec.y, tVec.z);
+            View = translate * View;
 
-                                       new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
-                                       new vec4(bb.RightDownFar.x, bb.RightDownFar.y, bb.LeftUpNear.z,1),
-                                       new vec4(bb.RightDownFar,1),
-                                       new vec4(bb.LeftUpNear.x, bb.RightDownFar.y, bb.RightDownFar.z,1)};
+            Target = GetWorldPosition();
+            var radius = (bb.LeftUpNear - bb.Center).Length;
+            var fovY = Math.Sqrt(3) / 3;
+            var fovX = fovY * AspectRatio;
+            var sin = (float)Math.Sin(Math.Min(fovY, fovX));
 
-            var minX = float.MaxValue;
-            var minY = float.MaxValue;
-            var maxX = float.MinValue;
-            var maxY = float.MinValue;
-            var maxZ = float.MinValue;
-
-            for (var i = 0; i < corners.Length; ++i)
-            {
-                corners[i] = View * corners[i];
-                minX = Math.Min(minX, corners[i].x);
-                maxX = Math.Max(maxX, corners[i].x);
-
-                minY = Math.Min(minY, corners[i].y);
-                maxY = Math.Max(maxY, corners[i].y);
-
-                maxZ = Math.Max(maxZ, corners[i].z);
-            }
-
-            var width = Math.Abs(maxX - minX);
-            var height = Math.Abs(maxY - minY);
-            var mHalfHeight = height / 2f;
-            var md = (float)Math.Sqrt(3) * mHalfHeight;
-            var delta = maxZ + md;
-            if (width > height)
-            {
-                var viewHalfHeight = 0.1f * (float)Math.Sqrt(3) / 3;
-                var viewHalfWidth = AspectRatio * viewHalfHeight;
-                var mHalfWidth = viewHalfWidth * md / 0.1f;
-                delta = maxZ + mHalfWidth;
-            }
-            Translate(0, 0, delta);
+            var distance = radius / sin;
+            translate = mat4.Translate(0, 0, -distance);
+            Length = distance;
+            View = translate * View;
         }
 
         public void ChangePosition(vec3 position)
